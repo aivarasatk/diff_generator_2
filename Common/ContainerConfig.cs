@@ -19,11 +19,13 @@ namespace DiffGenerator2.Common
             builder.RegisterType<ExcelReader>().As<IExcelReader>().InstancePerDependency();
             builder.RegisterType<CommandFactory>().As<ICommandFactory>().InstancePerDependency();
             builder.RegisterType<Command>().As<ICommand>().InstancePerDependency();
+            builder.RegisterType<NamingSchemeReader>().As<INamingSchemeReader>().InstancePerDependency();
+
             builder.RegisterType<LifetimeService>().As<ILifetimeService>().SingleInstance();
 
             var logger = CreateLogger();
             builder.RegisterInstance(logger).As<ILogger>();
-            builder.RegisterType<LogService>().As<ILogService>().InstancePerDependency();
+            builder.RegisterType<LogService>().As<ILogService>().SingleInstance();
 
             return builder.Build();
         }

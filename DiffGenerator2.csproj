@@ -94,6 +94,10 @@
     <Compile Include="Common\Command.cs" />
     <Compile Include="Common\ContainerConfig.cs" />
     <Compile Include="Constants\Legend.cs" />
+    <Compile Include="Constants\NamingSchemeSplitter.cs" />
+    <Compile Include="Constants\SheetName.cs" />
+    <Compile Include="Constants\UIDefault.cs" />
+    <Compile Include="DTOs\ColumnNamingScheme.cs" />
     <Compile Include="DTOs\EipDTO.cs" />
     <Compile Include="DTOs\ExcelDTO.cs" />
     <Compile Include="DTOs\SheetNavigation.cs" />
@@ -103,6 +107,7 @@
     <Compile Include="Interfaces\IExcelReader.cs" />
     <Compile Include="Interfaces\ILifetimeService.cs" />
     <Compile Include="Interfaces\ILogService.cs" />
+    <Compile Include="Interfaces\INamingSchemeReader.cs" />
     <Compile Include="Model\MainModel.cs" />
     <Compile Include="Model\MainModel.g.cs" />
     <Compile Include="Common\CommandFactory.cs" />
@@ -111,6 +116,7 @@
     <Compile Include="Services\LifetimeService.cs" />
     <Compile Include="Services\LogService.cs" />
     <Compile Include="Services\LoggerBuilder.cs" />
+    <Compile Include="Services\NamingSchemeReader.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

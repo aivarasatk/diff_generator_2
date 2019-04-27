@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DiffGenerator2.Constants;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -10,10 +11,9 @@ using System.Windows.Input;
 
 namespace DiffGenerator2.Model
 {
-    public partial class MainModel:INotifyPropertyChanged
+    public partial class MainModel : INotifyPropertyChanged, IDataErrorInfo
     {
         public static string ExcelFileNamePropertyName = "ExcelFileName";
-        partial void OnExcelFileNameChanged();
 
         public string ExcelFileName
         {
@@ -29,12 +29,10 @@ namespace DiffGenerator2.Model
                 _excelFileName = value;
 
                 OnPropertyChanged(ExcelFileNamePropertyName);
-                OnExcelFileNameChanged();
             }
         }
 
         public static string EipFileNamePropertyName = "EipFileName";
-        partial void OnEipFileNameChanged();
 
         public string EipFileName
         {
@@ -50,7 +48,6 @@ namespace DiffGenerator2.Model
                 _eipFileName = value;
 
                 OnPropertyChanged(EipFileNamePropertyName);
-                OnEipFileNameChanged();
                 //_eipFileNameSubject.OnNext(value);
             }
         }
@@ -87,12 +84,39 @@ namespace DiffGenerator2.Model
             }
         }
 
+        #region IDataErrorInfo Members
+        public string Error => throw new NotImplementedException();
+
+        public string this[string columnName]
+        {
+            get
+            {
+                string result = null;
+                if(columnName == "ExcelFileName")
+                {
+                    if (string.IsNullOrEmpty(ExcelFileName) || ExcelFileName == UIDefault.FileNotSelected)
+                    {
+                        result = "Būtina pasirinkti Excelio failą";
+                    }
+                }
+                if(columnName == "EipFileName")
+                {
+                    if (string.IsNullOrEmpty(EipFileName) || ExcelFileName == UIDefault.FileNotSelected)
+                    {
+                        result = "Būtina pasirinkti Eip failą";
+                    }
+                }
+                return result;
+            }
+        }
+        #endregion
+
+        #region INotificationChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged([CallerMemberName]string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-
+        #endregion
     }
 }

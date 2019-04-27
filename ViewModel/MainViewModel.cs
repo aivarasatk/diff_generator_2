@@ -1,11 +1,14 @@
 ﻿using Autofac;
 using DiffGenerator2.Common;
+using DiffGenerator2.Constants;
+using DiffGenerator2.DTOs;
 using DiffGenerator2.Enums;
 using DiffGenerator2.Interfaces;
 using DiffGenerator2.Model;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,13 +18,22 @@ namespace DiffGenerator2.ViewModel
     public class MainViewModel
     {
         private readonly ICommandFactory _commandFactory;
+        private readonly INamingSchemeReader _namingSchemeReader;
+        private readonly ILifetimeService _lifetimeService;
+        private readonly IExcelReader _excelReader;
+        private readonly IEipReader _eipReader;
         public MainModel Model { get; }
         private ILogService _logService;
 
-        public MainViewModel(ICommandFactory commandFactory, ILogService logService)
+        public MainViewModel(ICommandFactory commandFactory, ILogService logService, ILifetimeService lifetimeService,
+                             INamingSchemeReader namingSchemeReader, IExcelReader excelReader, IEipReader eipReader)
         {
             _commandFactory = commandFactory;
             _logService = logService;
+            _lifetimeService = lifetimeService;
+            _namingSchemeReader = namingSchemeReader;
+            _excelReader = excelReader;
+            _eipReader = eipReader;
             Model = new MainModel();
 
             InitComponents();
@@ -39,6 +51,7 @@ namespace DiffGenerator2.ViewModel
 
         private void SetSelectedFileName(FileSelect fileMode)
         {
+            _logService.Information("Openning file select dialog with file mode filter: {Mode}", fileMode.ToString());
             OpenFileDialog openFileDialog = new OpenFileDialog();
             switch (fileMode)
             {
@@ -48,6 +61,7 @@ namespace DiffGenerator2.ViewModel
                     {
                         Model.ExcelFileName = openFileDialog.FileName;
                     }
+                    _logService.Information("File selected {FileName}", Model.ExcelFileName);
                     break;
                 case FileSelect.Eip:
                     openFileDialog.Filter = "Eip |*.eip";
@@ -55,6 +69,7 @@ namespace DiffGenerator2.ViewModel
                     {
                         Model.EipFileName = openFileDialog.FileName;
                     }
+                    _logService.Information("File selected {FileName}", Model.EipFileName);
                     break;
                 default:
                     break;
@@ -64,14 +79,24 @@ namespace DiffGenerator2.ViewModel
 
         private void GenerateDiff()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var columnNamingScheme = _namingSchemeReader.GetColumnNamingScheme(ConfigurationManager.AppSettings["ColumnNamingSchemeFileName"]);
+                
+            }
+            catch(Exception ex)
+            {
+                _logService.Error("Gerenate Diff crashed", ex);
+                //show error to user.
+                throw;//TODO: REMOVE THROW WHEN USR ERROR IS COMPELETED
+            }
         }
 
         private void InitComponents()
         {
-            Model.ExcelFileName = "Failas nepasirinktas";
-            Model.EipFileName = "Failas nepasirinktas";
-            Model.ExecuteEnabled = false;
+            Model.ExcelFileName = UIDefault.FileNotSelected;
+            Model.EipFileName = UIDefault.FileNotSelected;
+            Model.ExecuteEnabled = true;
         }
     }
 }

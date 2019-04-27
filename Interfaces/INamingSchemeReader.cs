@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace DiffGenerator2.Interfaces
 {
-    public interface IExcelReader
+    public interface INamingSchemeReader
     {
-        SheetNavigation GetExcelSheetNavigation(string fileName);
+        List<ColumnNamingScheme> GetColumnNamingScheme(string fileName); 
     }
 }
