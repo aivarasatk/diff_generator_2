@@ -42,12 +42,30 @@ namespace DiffGenerator2.ViewModel
 
         private void Build()
         {
-            Model.SelectExcelFileCommand = _commandFactory.CreateCommand(() => SetSelectedFileName(FileSelect.Excel));
+            Model.SelectExcelFileCommand = _commandFactory.CreateCommand(() => SetExcelRelatedFields(FileSelect.Excel));
             Model.SelectEipFileCommand = _commandFactory.CreateCommand(() => SetSelectedFileName(FileSelect.Eip));
             Model.ExecuteCommand = _commandFactory.CreateCommand(() => GenerateDiff());
         }
 
-        
+        private void SetExcelRelatedFields(FileSelect excel)
+        {
+            SetSelectedFileName(excel);
+
+            _logService.Information("Getting excel sheet names");
+            var excelSheetNames = _excelReader.GetAvailableSheetNames(Model.ExcelFileName);
+            
+            Model.SheetItems.Clear();
+            _logService.Information("Creating checkboxes");
+            foreach (var sheetName in excelSheetNames)
+            {
+                Model.SheetItems.Add(new SheetItem
+                {
+                    Name = sheetName,
+                    IsChecked = true
+                });
+            }
+
+        }
 
         private void SetSelectedFileName(FileSelect fileMode)
         {
@@ -81,6 +99,16 @@ namespace DiffGenerator2.ViewModel
         {
             try
             {
+                var sheetNavigationDictionary = new Dictionary<string, SheetNavigation>();
+                foreach(var sheetBox in Model.SheetItems)
+                {
+                    if (sheetBox.IsChecked)
+                    {
+                        _logService.Information($"Getting sheet navigation for {sheetBox.Name}");
+                        var sheetNavigation = _excelReader.GetSheetNavigation(sheetBox.Name);
+                        sheetNavigationDictionary.Add(sheetBox.Name, sheetNavigation);
+                    }
+                }
                 var columnNamingScheme = _namingSchemeReader.GetColumnNamingScheme(ConfigurationManager.AppSettings["ColumnNamingSchemeFileName"]);
                 
             }

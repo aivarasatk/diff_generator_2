@@ -15,11 +15,24 @@ namespace DiffGenerator2.Services
 {
     public class ExcelReader : IExcelReader
     {
-        public SheetNavigation GetExcelSheetNavigation(string fileName)
+        private ExcelPackage _excelPackage;
+        public SheetNavigation GetSheetNavigation(string sheetName)
         {
-            using (var excelWorkbook = new ExcelPackage(new FileInfo(fileName)).Workbook)
+            var worksheet = _excelPackage.Workbook.Worksheets.FirstOrDefault(sheet => sheet.Name == sheetName);
+            var start = worksheet.Dimension.Start;
+            var end = worksheet.Dimension.End;
+            return null;
+        }
+
+        public IEnumerable<string> GetAvailableSheetNames(string fileName)
+        {
+            var fileInfo = new FileInfo(fileName);
+            _excelPackage = new ExcelPackage(fileInfo);
+
+            var workbook = _excelPackage.Workbook;
+            foreach(var workSheet in workbook.Worksheets)
             {
-                throw new NotImplementedException();
+                yield return workSheet.Name;
             }
         }
     }

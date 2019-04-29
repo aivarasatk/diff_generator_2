@@ -4,12 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="DiffChecker2" Height="150" Width="450" MinWidth="450" MinHeight="150" MaxHeight="150">
+        Title="DiffChecker2" Height="180" Width="450" MinWidth="450" MinHeight="180">
     <Grid Margin="10,10,10,10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
@@ -30,12 +31,42 @@
             <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" 
                        Text="Pasirinkite Excel failą:"/>
 
-            <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontStyle="Italic" Margin="0,0,10,0"
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontStyle="Italic" Margin="10,0,10,0"
                        TextTrimming="CharacterEllipsis" Text="{Binding Path=Model.ExcelFileName, ValidatesOnDataErrors=True}"/>
             <Button Grid.Column="2" Content="Pasirinkti" Width="Auto" Command="{Binding Path=Model.SelectExcelFileCommand}"/>
         </Grid>
 
         <Grid Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left"
+                       Text="Pažymėkite lapus tikrinimui:"/>
+
+            <ItemsControl Grid.Column="1" ItemsSource="{Binding Model.SheetItems, Mode=TwoWay}" Margin="10,0,0,0">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox IsChecked="{Binding IsChecked}" Margin="0,0,10,0">
+                            <TextBlock Text="{Binding Name}"/>
+                        </CheckBox>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+        </Grid>
+
+        <Grid Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="150" />
                 <ColumnDefinition Width="3*" />
@@ -48,12 +79,12 @@
             <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left"
                        Text="Pasirinkite Eip failą:"/>
 
-            <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontStyle="Italic"  Margin="0,0,10,0" 
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontStyle="Italic"  Margin="10,0,10,0" 
                        TextTrimming="CharacterEllipsis" Text="{Binding Path=Model.EipFileName, ValidatesOnDataErrors=True}"/>
             <Button Grid.Column="2" Content="Pasirinkti" Command="{Binding Path=Model.SelectEipFileCommand}"/>
         </Grid>
 
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
@@ -66,7 +97,7 @@
             <TextBlock Grid.Column="0"/>
         </Grid>
 
-        <Grid Grid.Row="3">
+        <Grid Grid.Row="4">
             <TextBlock Text="{Binding ValidationErrors}"/>
         </Grid>
     </Grid>

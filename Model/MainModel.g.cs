@@ -1,6 +1,8 @@
 ﻿using DiffGenerator2.Constants;
+using DiffGenerator2.DTOs;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Subjects;
@@ -64,7 +66,6 @@ namespace DiffGenerator2.Model
         */
 
         public static string ExecuteEnabledPropertyName = "ExecuteEnabled";
-        partial void OnExecuteEnabledChanged();
 
         public bool ExecuteEnabled
         {
@@ -80,7 +81,25 @@ namespace DiffGenerator2.Model
                 _executeEnabled = value;
 
                 OnPropertyChanged();
-                OnExecuteEnabledChanged();
+            }
+        }
+
+        public static string SheetItemsPropertyName = "SheetNamesPropertyName";
+
+        public ObservableCollection<SheetItem> SheetItems
+        {
+            get
+            {
+                return _sheetItems;
+            }
+            set
+            {
+                if (_sheetItems == value)
+                    return;
+
+                _sheetItems = value;
+
+                OnPropertyChanged();
             }
         }
 

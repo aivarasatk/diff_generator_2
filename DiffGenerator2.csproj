@@ -95,7 +95,7 @@
     <Compile Include="Common\ContainerConfig.cs" />
     <Compile Include="Constants\Legend.cs" />
     <Compile Include="Constants\NamingSchemeSplitter.cs" />
-    <Compile Include="Constants\SheetName.cs" />
+    <Compile Include="Constants\SheetNavigationIdentifiers.cs" />
     <Compile Include="Constants\UIDefault.cs" />
     <Compile Include="DTOs\ColumnNamingScheme.cs" />
     <Compile Include="DTOs\EipDTO.cs" />
@@ -111,6 +111,7 @@
     <Compile Include="Model\MainModel.cs" />
     <Compile Include="Model\MainModel.g.cs" />
     <Compile Include="Common\CommandFactory.cs" />
+    <Compile Include="DTOs\SheetItem.cs" />
     <Compile Include="Services\EipReader.cs" />
     <Compile Include="Services\ExcelReader.cs" />
     <Compile Include="Services\LifetimeService.cs" />
