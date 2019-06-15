@@ -9,7 +9,7 @@ namespace DiffGenerator2.Interfaces
 {
     public interface IExcelReader
     {
-        SheetNavigation GetSheetNavigation(string fileName);
+        SheetNavigation GetSheetNavigation(string sheetName);
         IEnumerable<string> GetAvailableSheetNames(string fileName);
     }
 }

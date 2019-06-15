@@ -64,29 +64,18 @@ namespace DiffGenerator2.ViewModel
                     IsChecked = true
                 });
             }
-
         }
-
         private void SetSelectedFileName(FileSelect fileMode)
         {
             _logService.Information("Openning file select dialog with file mode filter: {Mode}", fileMode.ToString());
-            OpenFileDialog openFileDialog = new OpenFileDialog();
             switch (fileMode)
             {
                 case FileSelect.Excel:
-                    openFileDialog.Filter = "Excel |*.xlsx";
-                    if (openFileDialog.ShowDialog() == true)
-                    {
-                        Model.ExcelFileName = openFileDialog.FileName;
-                    }
+                    Model.ExcelFileName = GetSelectedFile("Excel |*.xlsx") ?? UIDefault.FileNotSelected;
                     _logService.Information("File selected {FileName}", Model.ExcelFileName);
                     break;
                 case FileSelect.Eip:
-                    openFileDialog.Filter = "Eip |*.eip";
-                    if (openFileDialog.ShowDialog() == true)
-                    {
-                        Model.EipFileName = openFileDialog.FileName;
-                    }
+                    Model.EipFileName = GetSelectedFile("Eip |*.eip") ?? UIDefault.FileNotSelected;
                     _logService.Information("File selected {FileName}", Model.EipFileName);
                     break;
                 default:
@@ -95,19 +84,24 @@ namespace DiffGenerator2.ViewModel
             }
         }
 
+        private string GetSelectedFile(string filter)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = filter
+            };
+            return openFileDialog.ShowDialog() == true ? openFileDialog.FileName : null;
+        }
+
         private void GenerateDiff()
         {
             try
             {
-                var sheetNavigationDictionary = new Dictionary<string, SheetNavigation>();
-                foreach(var sheetBox in Model.SheetItems)
+                var sheetNavigationDictionary = GetSheetNavigation();
+                if(sheetNavigationDictionary == null)
                 {
-                    if (sheetBox.IsChecked)
-                    {
-                        _logService.Information($"Getting sheet navigation for {sheetBox.Name}");
-                        var sheetNavigation = _excelReader.GetSheetNavigation(sheetBox.Name);
-                        sheetNavigationDictionary.Add(sheetBox.Name, sheetNavigation);
-                    }
+                    //show user error.
+                    throw new Exception(); //TODO: remove after error exists
                 }
                 var columnNamingScheme = _namingSchemeReader.GetColumnNamingScheme(ConfigurationManager.AppSettings["ColumnNamingSchemeFileName"]);
                 
@@ -118,6 +112,23 @@ namespace DiffGenerator2.ViewModel
                 //show error to user.
                 throw;//TODO: REMOVE THROW WHEN USR ERROR IS COMPELETED
             }
+        }
+
+        private IDictionary<string, SheetNavigation> GetSheetNavigation()
+        {
+            var sheetNavigationDictionary = new Dictionary<string, SheetNavigation>();
+            var checkedSheetItems = Model.SheetItems.Where(item => item.IsChecked);
+            foreach (var checkedSheet in checkedSheetItems)
+            {
+                _logService.Information($"Getting sheet navigation for {checkedSheet.Name}");
+                var sheetNavigation = _excelReader.GetSheetNavigation(checkedSheet.Name);
+                if (sheetNavigation == null)
+                {
+                    return null;
+                }
+                sheetNavigationDictionary.Add(checkedSheet.Name, sheetNavigation);
+            }
+            return sheetNavigationDictionary;
         }
 
         private void InitComponents()

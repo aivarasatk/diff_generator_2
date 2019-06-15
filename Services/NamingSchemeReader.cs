@@ -36,7 +36,7 @@ namespace DiffGenerator2.Services
                 }
                 catch(Exception ex)
                 {
-                    _logService.Error("Could not convert string to int", ex);
+                    _logService.Error("Could not convert naming scheme string value to int", ex);
                     throw;
                 }
             }
