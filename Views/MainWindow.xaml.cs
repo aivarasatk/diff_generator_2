@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Autofac;
+using DiffGenerator2.Common;
+using DiffGenerator2.Interfaces;
+using DiffGenerator2.ViewModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace DiffGenerator2.Views
 {
@@ -22,6 +14,9 @@ namespace DiffGenerator2.Views
         public MainWindow()
         {
             InitializeComponent();
+            var configuration = ContainerConfig.Configure();
+            var mainViewModel = configuration.Resolve<MainViewModel>();
+            DataContext = mainViewModel;
         }
     }
 }
