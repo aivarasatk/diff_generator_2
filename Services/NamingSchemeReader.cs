@@ -17,7 +17,7 @@ namespace DiffGenerator2.Services
         {
             _logService = logService;
         }
-        public List<ColumnNamingScheme> GetColumnNamingScheme(string fileName)
+        public IList<ColumnNamingScheme> GetColumnNamingScheme(string fileName)
         {
             var fileContents = System.IO.File.ReadAllText(fileName);
             var splitContents = fileContents.Split(NamingSchemeSplitter.Main);

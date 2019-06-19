@@ -9,6 +9,6 @@ namespace DiffGenerator2.Interfaces
 {
     public interface INamingSchemeReader
     {
-        List<ColumnNamingScheme> GetColumnNamingScheme(string fileName); 
+        IList<ColumnNamingScheme> GetColumnNamingScheme(string fileName); 
     }
 }
