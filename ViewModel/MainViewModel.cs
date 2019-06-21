@@ -95,6 +95,7 @@ namespace DiffGenerator2.ViewModel
 
         private void GenerateDiff()
         {
+            //var a = _eipReader.GetEipContents(Model.EipFileName); 
             try
             {
                 var sheetNavigationDictionary = GetSheetNavigation();
@@ -108,7 +109,7 @@ namespace DiffGenerator2.ViewModel
             }
             catch(Exception ex)
             {
-                _logService.Error("Gerenate Diff crashed", ex);
+                _logService.Error("Generate Diff crashed", ex);
                 //show error to user.
                 throw;//TODO: REMOVE THROW WHEN USR ERROR IS COMPELETED
             }
