@@ -25,6 +25,11 @@ namespace DiffGenerator2.Services
 
         public SheetNavigation GetSheetNavigation(string sheetName)
         {
+            if(_excelPackage == null)
+            {
+                throw new ArgumentNullException(nameof(_excelPackage));
+            }
+
             if (sheetName == null)
             {
                 _logService.Error("Sheet name is null. Cannot get SheetNavigation");
@@ -94,8 +99,6 @@ namespace DiffGenerator2.Services
                 _logService.Error("Could not convert Kodas numeric values", ex);
                 throw;
             }
-
-            
         }
 
         public IEnumerable<string> GetAvailableSheetNames(string fileName)
@@ -108,6 +111,11 @@ namespace DiffGenerator2.Services
             {
                 yield return workSheet.Name;
             }
+        }
+
+        public IEnumerable<ExcelProductData> GetExcelProductData()
+        {
+            throw new NotImplementedException();
         }
     }
 }

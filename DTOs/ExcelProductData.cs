@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace DiffGenerator2.DTOs
 {
-    public class ColumnNamingScheme
+    public class ExcelProductData
     {
-        public string Name { get; set; }
-        public int Id{ get; set; }
     }
 }

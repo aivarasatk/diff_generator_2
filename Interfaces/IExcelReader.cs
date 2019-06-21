@@ -11,5 +11,7 @@ namespace DiffGenerator2.Interfaces
     {
         SheetNavigation GetSheetNavigation(string sheetName);
         IEnumerable<string> GetAvailableSheetNames(string fileName);
+        IEnumerable<ExcelProductData> GetExcelProductData();
+
     }
 }
