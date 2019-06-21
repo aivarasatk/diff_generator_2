@@ -18,7 +18,6 @@ namespace DiffGenerator2.ViewModel
     public class MainViewModel
     {
         private readonly ICommandFactory _commandFactory;
-        private readonly INamingSchemeReader _namingSchemeReader;
         private readonly ILifetimeService _lifetimeService;
         private readonly IExcelReader _excelReader;
         private readonly IEipReader _eipReader;
@@ -26,12 +25,11 @@ namespace DiffGenerator2.ViewModel
         private ILogService _logService;
 
         public MainViewModel(ICommandFactory commandFactory, ILogService logService, ILifetimeService lifetimeService,
-                             INamingSchemeReader namingSchemeReader, IExcelReader excelReader, IEipReader eipReader)
+                              IExcelReader excelReader, IEipReader eipReader)
         {
             _commandFactory = commandFactory;
             _logService = logService;
             _lifetimeService = lifetimeService;
-            _namingSchemeReader = namingSchemeReader;
             _excelReader = excelReader;
             _eipReader = eipReader;
             Model = new MainModel();
@@ -102,9 +100,9 @@ namespace DiffGenerator2.ViewModel
                 if(sheetNavigationDictionary == null)
                 {
                     //show user error.
-                    throw new Exception(); //TODO: remove after error exists
+                    throw new Exception("Failed to get sheet navigation"); //TODO: remove after error exists
                 }
-                var columnNamingScheme = _namingSchemeReader.GetColumnNamingScheme(ConfigurationManager.AppSettings["ColumnNamingSchemeFileName"]);
+
                 
             }
             catch(Exception ex)
@@ -125,6 +123,7 @@ namespace DiffGenerator2.ViewModel
                 var sheetNavigation = _excelReader.GetSheetNavigation(checkedSheet.Name);
                 if (sheetNavigation == null)
                 {
+                    _logService.Error($"Could not read sheet navigation for {checkedSheet.Name}");
                     return null;
                 }
                 sheetNavigationDictionary.Add(checkedSheet.Name, sheetNavigation);

@@ -19,7 +19,6 @@ namespace DiffGenerator2.Common
             builder.RegisterType<ExcelReader>().As<IExcelReader>().InstancePerDependency();
             builder.RegisterType<CommandFactory>().As<ICommandFactory>().InstancePerDependency();
             builder.RegisterType<Command>().As<ICommand>().InstancePerDependency();
-            builder.RegisterType<NamingSchemeReader>().As<INamingSchemeReader>().InstancePerDependency();
 
             builder.RegisterType<LifetimeService>().As<ILifetimeService>().SingleInstance();
 
