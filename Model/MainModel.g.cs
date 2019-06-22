@@ -86,7 +86,7 @@ namespace DiffGenerator2.Model
 
         public static string SheetItemsPropertyName = "SheetNamesPropertyName";
 
-        public ObservableCollection<SheetItem> SheetItems
+        public ObservableCollection<SheetCheckBoxItem> SheetItems
         {
             get
             {

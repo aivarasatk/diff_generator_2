@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DiffGenerator2.DTOs
 {
-    public class SheetItem
+    public class SheetCheckBoxItem
     {
         public string Name { get; set; }
         public bool IsChecked { get; set; }

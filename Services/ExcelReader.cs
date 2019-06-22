@@ -6,10 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
 using System.Configuration;
 
 namespace DiffGenerator2.Services
@@ -23,66 +19,104 @@ namespace DiffGenerator2.Services
             _logService = logService ?? throw new ArgumentNullException(nameof(logService));
         }
 
-        public SheetNavigation GetSheetNavigation(string sheetName)
+        public IEnumerable<string> GetAvailableSheetNames(string fileName)//TODO: ASYNC/AWAIT. this can take some time and blocks UI
+        {
+            var fileInfo = new FileInfo(fileName);
+            _excelPackage = new ExcelPackage(fileInfo);
+
+            var workbook = _excelPackage.Workbook;
+            foreach (var workSheet in workbook.Worksheets)
+            {
+                yield return workSheet.Name;
+            }
+        }
+
+        public IEnumerable<ExcelBlockData> GetExcelProductData(IEnumerable<SheetCheckBoxItem> selectedSheets)
         {
             if(_excelPackage == null)
             {
                 throw new ArgumentNullException(nameof(_excelPackage));
             }
 
-            if (sheetName == null)
+            var sheetNavigationDictionary = GetSheetNavigations(selectedSheets);
+            foreach (var sheetNavigation in sheetNavigationDictionary)
             {
-                _logService.Error("Sheet name is null. Cannot get SheetNavigation");
-                throw new ArgumentNullException(nameof(sheetName));
-            }
-            try
-            {
-                var worksheet = _excelPackage.Workbook.Worksheets.FirstOrDefault(sheet => sheet.Name == sheetName);
-                return SheetNavigation(worksheet);
-            }
-            catch (Exception ex)
-            {
-                _logService.Error("Error while getting SheetNavigation ", ex);
-                throw;
+                _logService.Information($"Getting which blocks to read for {sheetNavigation.Key}");
+                var blockDataToRead = GetBlocksToRead(sheetNavigation).ToList();
+
             }
             
+            return null;
+        }
+
+        private IDictionary<string, SheetNavigation> GetSheetNavigations(IEnumerable<SheetCheckBoxItem> sheetItems)
+        {
+            var sheetDictionary = new Dictionary<string, SheetNavigation>();
+            foreach (var sheetItem in sheetItems)
+            {
+                _logService.Information($"Getting sheet navigation for {sheetItem.Name}");
+                var worksheet = _excelPackage.Workbook.Worksheets.FirstOrDefault(sheet => sheet.Name == sheetItem.Name);
+                var sheetNavigation = SheetNavigation(worksheet);
+
+                if (sheetNavigation == null)
+                {
+                    throw new Exception($"Could not read sheet navigation for { sheetItem.Name}");
+                }
+                sheetDictionary.Add(sheetItem.Name, sheetNavigation);
+            }
+            return sheetDictionary;
+
         }
 
         private SheetNavigation SheetNavigation(ExcelWorksheet worksheet)
         {
-            if(!Int32.TryParse(ConfigurationManager.AppSettings["SheetNavigationDataRow"], out var navigationRowId))
+            var navigationRowId = GetNavigationRowId();
+            var sheetNavigation = new SheetNavigation();
+            for (var columnId = 1; columnId <= worksheet.Dimension.Columns; ++columnId)
+            {
+                if (AllSheetNavigationFieldsSet(sheetNavigation))
+                {
+                    return sheetNavigation;
+                }
+
+                var value = worksheet.GetValue<string>(navigationRowId, columnId);
+                if (value == null)
+                {
+                    continue;
+                }
+
+                if (value == SheetNavigationIdentifiers.GamybosPadalinys)
+                {
+                    sheetNavigation.MakerColumn = columnId;
+                }
+                if (value.Contains(SheetNavigationIdentifiers.Kodas))
+                {
+                    sheetNavigation.CodeColumn = columnId;
+                    sheetNavigation = SheetNavigationWithDataAndHeaderIds(sheetNavigation, value);
+                }
+                if (value == SheetNavigationIdentifiers.PreparatoPavadinimas)
+                {
+                    sheetNavigation.NameColumn = columnId;
+                }
+            }
+            return null;
+        }
+
+        private int GetNavigationRowId()
+        {
+            if (!Int32.TryParse(ConfigurationManager.AppSettings["SheetNavigationDataRow"], out var navigationRowId))
             {
                 _logService.Error("App config 'SheetNavigationDataRow' is not a numeric value");
                 throw new ArgumentException("App config 'SheetNavigationDataRow' is not a numeric value");
             }
-            var sheetNavigation = new SheetNavigation();
-            for(var columnId = 1; columnId <= worksheet.Dimension.Columns; ++columnId)
-            {
-                if (sheetNavigation.PadalinysColumn != 0 && sheetNavigation.PavadinimasColumn != 0
-                    && sheetNavigation.KodasColumn != 0)
-                {
-                    return sheetNavigation;
-                }
-                var value = worksheet.GetValue<string>(navigationRowId, columnId);
-                if(value == null)
-                {
-                    continue;
-                }
-                if (value == SheetNavigationIdentifiers.GamybosPadalinys)
-                {
-                    sheetNavigation.PadalinysColumn = columnId;
-                }
-                if(value.Contains(SheetNavigationIdentifiers.Kodas))
-                {
-                    sheetNavigation.KodasColumn = columnId;
-                    sheetNavigation = SheetNavigationWithDataAndHeaderIds(sheetNavigation, value);
-                }
-                if(value == SheetNavigationIdentifiers.PreparatoPavadinimas)
-                {
-                    sheetNavigation.PavadinimasColumn = columnId;
-                }
-            }
-            return null;
+            return navigationRowId;
+        }
+
+        private bool AllSheetNavigationFieldsSet(SheetNavigation sheetNavigation)
+        {
+            return sheetNavigation.MakerColumn != 0
+                   && sheetNavigation.NameColumn != 0
+                   && sheetNavigation.CodeColumn != 0;
         }
 
         private SheetNavigation SheetNavigationWithDataAndHeaderIds(SheetNavigation sheetNavigation, string excelValue)
@@ -94,28 +128,99 @@ namespace DiffGenerator2.Services
                 sheetNavigation.DataStartRow = Int32.Parse(splitValues[2]);
                 return sheetNavigation;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logService.Error("Could not convert Kodas numeric values", ex);
                 throw;
             }
         }
 
-        public IEnumerable<string> GetAvailableSheetNames(string fileName)
+        private IEnumerable<BlockDataColumns> GetBlocksToRead(KeyValuePair<string, SheetNavigation> sheetNavigation)
         {
-            var fileInfo = new FileInfo(fileName);
-            _excelPackage = new ExcelPackage(fileInfo);
+            var workbook = _excelPackage.Workbook.Worksheets.First(sh => sh.Name == sheetNavigation.Key);
+            var navigationRowId = GetNavigationRowId();
+            var blockStartColumn = GetBlockStartColumn(workbook, navigationRowId);
 
-            var workbook = _excelPackage.Workbook;
-            foreach(var workSheet in workbook.Worksheets)
+            var blockDataColumns = new BlockDataColumns();
+            for (int i = blockStartColumn; i < workbook.Dimension.Columns; ++i)
             {
-                yield return workSheet.Name;
+                var value = workbook.GetValue<string>(navigationRowId, i);
+                if(value == null)
+                {
+                    continue;
+                }
+
+                if (AllBlockDataColumnsSet(blockDataColumns))
+                {
+                    yield return blockDataColumns;
+                    blockDataColumns = new BlockDataColumns();
+                }
+
+                //if END was found but blockDataColumns contains some valid values - row is malformed
+                if(value.ToLower() == ExcelDataBlockColumnNaming.EndLowerCase)
+                {
+                    if(AllBlockDataColumnsUnset(blockDataColumns))
+                    {
+                        yield break;
+                    }
+                    throw new Exception($"Malformed row that identifies which blocks to read for {workbook.Name}");
+                }
+
+                if (value == ExcelDataBlockColumnNaming.AmountFirstHalf)
+                {
+                    blockDataColumns.AmountFirstHalf = i;
+                }
+                else if (value == ExcelDataBlockColumnNaming.AmountSecondHalf)
+                {
+                    blockDataColumns.AmountSecondHalf = i;
+                }
+                else if (value == ExcelDataBlockColumnNaming.Date)
+                {
+                    blockDataColumns.Date = i;
+                }
+                else if (value == ExcelDataBlockColumnNaming.Comments)
+                {
+                    blockDataColumns.Comments = i;
+                }
             }
+            throw new Exception($"Malformed row that identifies which blocks to read for {workbook.Name}");
         }
 
-        public IEnumerable<ExcelProductData> GetExcelProductData()
+        private bool AllBlockDataColumnsSet(BlockDataColumns blockDataColumns)
         {
-            throw new NotImplementedException();
+            return blockDataColumns.AmountFirstHalf != 0
+                && blockDataColumns.AmountSecondHalf != 0
+                && blockDataColumns.Date != 0
+                && blockDataColumns.Comments != 0;
+        }
+
+        private bool AllBlockDataColumnsUnset(BlockDataColumns blockDataColumns)
+        {
+            return blockDataColumns.AmountFirstHalf == 0
+                && blockDataColumns.AmountSecondHalf == 0
+                && blockDataColumns.Date == 0
+                && blockDataColumns.Comments == 0;
+        }
+
+        private int GetBlockStartColumn(ExcelWorksheet workbook, int navigationRowId)
+        {
+            for(var i = 1; i < workbook.Dimension.Columns; ++i)
+            {
+                var cellValue = workbook.GetValue<string>(navigationRowId, i);
+                if(cellValue != null && CellValueContainsBlockColumnNaming(cellValue.Trim()))
+                {
+                    return i;
+                }
+            }
+            throw new Exception($"Could not find blocks to read for {workbook.Name}");
+        }
+
+        private bool CellValueContainsBlockColumnNaming(string cellValue)
+        {
+            return cellValue == ExcelDataBlockColumnNaming.AmountFirstHalf
+                || cellValue == ExcelDataBlockColumnNaming.AmountSecondHalf
+                || cellValue == ExcelDataBlockColumnNaming.Date
+                || cellValue == ExcelDataBlockColumnNaming.Comments;
         }
     }
 }

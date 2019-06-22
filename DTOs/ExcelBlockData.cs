@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DiffGenerator2.DTOs
+{
+    public class ExcelBlockData
+    {
+        DateTime Date { get; set; }
+        IEnumerable<ExcelProductData> ProductData { get; set; }
+    }
+}
