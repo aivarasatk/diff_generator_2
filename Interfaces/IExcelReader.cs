@@ -9,9 +9,7 @@ namespace DiffGenerator2.Interfaces
 {
     public interface IExcelReader
     {
-        SheetNavigation GetSheetNavigation(string sheetName);
         IEnumerable<string> GetAvailableSheetNames(string fileName);
-        IEnumerable<ExcelProductData> GetExcelProductData();
-
+        IEnumerable<ExcelBlockData> GetExcelProductData(IEnumerable<SheetCheckBoxItem> sheetItems);
     }
 }

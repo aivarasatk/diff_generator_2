@@ -14,7 +14,7 @@ namespace DiffGenerator2.Model
         private string _excelFileName;
         private string _eipFileName;
         private bool _executeEnabled;
-        private ObservableCollection<SheetItem> _sheetItems;
+        private ObservableCollection<SheetCheckBoxItem> _sheetItems;
 
         public ICommand SelectExcelFileCommand { get; set; }
         public ICommand SelectEipFileCommand { get; set; }
@@ -22,7 +22,7 @@ namespace DiffGenerator2.Model
 
         public MainModel()
         {
-            _sheetItems = new ObservableCollection<SheetItem>();
+            _sheetItems = new ObservableCollection<SheetCheckBoxItem>();
         }
 
     }
