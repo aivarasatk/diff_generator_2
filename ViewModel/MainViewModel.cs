@@ -34,6 +34,7 @@ namespace DiffGenerator2.ViewModel
             _eipReader = eipReader;
             Model = new MainModel();
 
+            _logService.Information("PROGRAM STARTING!\n");
             InitComponents();
             Build();
         }
@@ -95,8 +96,16 @@ namespace DiffGenerator2.ViewModel
         {
             try
             {
-                var excelProductData = _excelReader.GetExcelProductData(Model.SheetItems.Where(item => item.IsChecked));
-                
+                _logService.Information("Started generating diff");
+                var excelProductData = _excelReader.GetExcelProductData(Model.SheetItems.Where(item => item.IsChecked)).ToList();
+                foreach(var product in excelProductData)
+                {
+                    foreach(var data in product.ProductData)
+                    {
+
+                    }
+                }
+                _logService.Information("Finished generating diff");
             }
             catch(Exception ex)
             {

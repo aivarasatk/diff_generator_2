@@ -14,6 +14,9 @@ namespace DiffGenerator2.DTOs
         public int AmountFirstHalf{ get; set; } //I Puse
         public int AmountSecondHalf { get; set; } //II Puse 
         public DateTime Date { get; set; } //Data
-        public string Comments{ get; set; } //Pastabos
+        public string Details{ get; set; } //Pastabos
+        public IEnumerable<string> Comments { get; set; } //langeliu komentarai
+        public bool HasShapes { get; set; }
+        public IEnumerable<string> CellBackgroundColors { get; set; }
     }
 }
