@@ -8,7 +8,7 @@ namespace DiffGenerator2.DTOs
 {
     public class ExcelBlockData
     {
-        DateTime Date { get; set; }
-        IEnumerable<ExcelProductData> ProductData { get; set; }
+        public DateTime Date { get; set; }
+        public IEnumerable<ExcelProductData> ProductData { get; set; }
     }
 }
