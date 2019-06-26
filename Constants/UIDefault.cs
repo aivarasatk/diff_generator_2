@@ -8,6 +8,6 @@ namespace DiffGenerator2.Constants
 {
     public static class UIDefault
     {
-        public static string FileNotSelected = "Failas nepasirinktas";
+        public const string FileNotSelected = "Failas nepasirinktas";
     }
 }

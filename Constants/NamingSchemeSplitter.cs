@@ -8,7 +8,7 @@ namespace DiffGenerator2.Constants
 {
     public static class NamingSchemeSplitter
     {
-        public static char Main = ';';
-        public static char Secondary = '-';
+        public const char Main = ';';
+        public const char Secondary = '-';
     }
 }

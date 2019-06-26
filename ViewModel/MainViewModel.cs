@@ -34,6 +34,7 @@ namespace DiffGenerator2.ViewModel
             _eipReader = eipReader;
             Model = new MainModel();
 
+            _logService.Information("PROGRAM STARTING!\n");
             InitComponents();
             Build();
         }
@@ -56,7 +57,7 @@ namespace DiffGenerator2.ViewModel
             _logService.Information("Creating checkboxes");
             foreach (var sheetName in excelSheetNames)
             {
-                Model.SheetItems.Add(new SheetItem
+                Model.SheetItems.Add(new SheetCheckBoxItem
                 {
                     Name = sheetName,
                     IsChecked = true
@@ -93,42 +94,25 @@ namespace DiffGenerator2.ViewModel
 
         private void GenerateDiff()
         {
-            var a = _eipReader.GetEipContents(Model.EipFileName); 
             try
             {
-                var sheetNavigationDictionary = GetSheetNavigation();
-                if(sheetNavigationDictionary == null)
+                _logService.Information("Started generating diff");
+                var excelProductData = _excelReader.GetExcelProductData(Model.SheetItems.Where(item => item.IsChecked)).ToList();
+                foreach(var product in excelProductData)
                 {
-                    //show user error.
-                    throw new Exception("Failed to get sheet navigation"); //TODO: remove after error exists
-                }
+                    foreach(var data in product.ProductData)
+                    {
 
-                
+                    }
+                }
+                _logService.Information("Finished generating diff");
             }
             catch(Exception ex)
             {
-                _logService.Error("Generate Diff crashed", ex);
+                _logService.Error("Gerenate Diff error. ", ex);
                 //show error to user.
                 throw;//TODO: REMOVE THROW WHEN USR ERROR IS COMPELETED
             }
-        }
-
-        private IDictionary<string, SheetNavigation> GetSheetNavigation()
-        {
-            var sheetNavigationDictionary = new Dictionary<string, SheetNavigation>();
-            var checkedSheetItems = Model.SheetItems.Where(item => item.IsChecked);
-            foreach (var checkedSheet in checkedSheetItems)
-            {
-                _logService.Information($"Getting sheet navigation for {checkedSheet.Name}");
-                var sheetNavigation = _excelReader.GetSheetNavigation(checkedSheet.Name);
-                if (sheetNavigation == null)
-                {
-                    _logService.Error($"Could not read sheet navigation for {checkedSheet.Name}");
-                    return null;
-                }
-                sheetNavigationDictionary.Add(checkedSheet.Name, sheetNavigation);
-            }
-            return sheetNavigationDictionary;
         }
 
         private void InitComponents()
