@@ -93,7 +93,7 @@ namespace DiffGenerator2.ViewModel
 
         private void GenerateDiff()
         {
-            //var a = _eipReader.GetEipContents(Model.EipFileName); 
+            var a = _eipReader.GetEipContents(Model.EipFileName); 
             try
             {
                 var sheetNavigationDictionary = GetSheetNavigation();

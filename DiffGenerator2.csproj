@@ -110,6 +110,8 @@
     <Compile Include="Model\MainModel.g.cs" />
     <Compile Include="Common\CommandFactory.cs" />
     <Compile Include="DTOs\SheetItem.cs" />
+    <Compile Include="DTOs\I06.cs" />
+    <Compile Include="DTOs\I07.cs" />
     <Compile Include="Services\EipReader.cs" />
     <Compile Include="Services\ExcelReader.cs" />
     <Compile Include="Services\LifetimeService.cs" />
