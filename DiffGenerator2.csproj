@@ -103,6 +103,8 @@
     <Compile Include="DTOs\EipDTO.cs" />
     <Compile Include="DTOs\ExcelBlockData.cs" />
     <Compile Include="DTOs\ExcelProductData.cs" />
+    <Compile Include="DTOs\I06.cs" />
+    <Compile Include="DTOs\I07.cs" />
     <Compile Include="DTOs\SheetNavigation.cs" />
     <Compile Include="Enums\FileSelect.cs" />
     <Compile Include="Interfaces\ICommandFactory.cs" />
