@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DiffGenerator2.DTOs;
+using DiffGenerator2.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +10,6 @@ namespace DiffGenerator2.Interfaces
 {
     public interface IEipReader
     {
-
+        IEnumerable<I07> GetEipContents(string eipFileName);
     }
 }
