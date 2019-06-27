@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace DiffGenerator2.Model
@@ -14,6 +15,7 @@ namespace DiffGenerator2.Model
         private string _excelFileName;
         private string _eipFileName;
         private bool _executeEnabled;
+        private Visibility _isLoading;
         private ObservableCollection<SheetCheckBoxItem> _sheetItems;
 
         public ICommand SelectExcelFileCommand { get; set; }
