@@ -12,6 +12,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace DiffGenerator2.ViewModel
 {
@@ -48,6 +49,7 @@ namespace DiffGenerator2.ViewModel
 
         private void SetExcelRelatedFields(FileSelect excel)
         {
+            Model.IsLoading = Visibility.Visible;
             SetSelectedFileName(excel);
 
             _logService.Information("Getting excel sheet names");
@@ -63,6 +65,7 @@ namespace DiffGenerator2.ViewModel
                     IsChecked = true
                 });
             }
+            Model.IsLoading = Visibility.Collapsed;
         }
         private void SetSelectedFileName(FileSelect fileMode)
         {
@@ -98,13 +101,8 @@ namespace DiffGenerator2.ViewModel
             {
                 _logService.Information("Started generating diff");
                 var excelProductData = _excelReader.GetExcelProductData(Model.SheetItems.Where(item => item.IsChecked)).ToList();
-                foreach(var product in excelProductData)
-                {
-                    foreach(var data in product.ProductData)
-                    {
 
-                    }
-                }
+
                 _logService.Information("Finished generating diff");
             }
             catch(Exception ex)
@@ -120,6 +118,7 @@ namespace DiffGenerator2.ViewModel
             Model.ExcelFileName = UIDefault.FileNotSelected;
             Model.EipFileName = UIDefault.FileNotSelected;
             Model.ExecuteEnabled = true;
+            Model.IsLoading = Visibility.Collapsed;
         }
     }
 }

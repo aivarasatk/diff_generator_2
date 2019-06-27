@@ -9,6 +9,7 @@ using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace DiffGenerator2.Model
@@ -50,20 +51,8 @@ namespace DiffGenerator2.Model
                 _eipFileName = value;
 
                 OnPropertyChanged(EipFileNamePropertyName);
-                //_eipFileNameSubject.OnNext(value);
             }
         }
-        /*
-        private ISubject<string> _eipFileNameSubject = new Subject<string>();
-
-        public IObservable<string> EipFileNameObservable
-        {
-            get
-            {
-                return _eipFileNameSubject;
-            }
-        }
-        */
 
         public static string ExecuteEnabledPropertyName = "ExecuteEnabled";
 
@@ -80,7 +69,7 @@ namespace DiffGenerator2.Model
 
                 _executeEnabled = value;
 
-                OnPropertyChanged();
+                OnPropertyChanged(ExecuteEnabledPropertyName);
             }
         }
 
@@ -99,7 +88,26 @@ namespace DiffGenerator2.Model
 
                 _sheetItems = value;
 
-                OnPropertyChanged();
+                OnPropertyChanged(SheetItemsPropertyName);
+            }
+        }
+
+        public static string IsLoadingPropertyName = "IsLoading";
+
+        public Visibility IsLoading
+        {
+            get
+            {
+                return _isLoading;
+            }
+            set
+            {
+                if (_isLoading == value)
+                    return;
+
+                _isLoading = value;
+
+                OnPropertyChanged(IsLoadingPropertyName);
             }
         }
 
