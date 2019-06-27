@@ -4,4 +4,4 @@
 ## Read .eip file 
 ## Generate difference report
 
-### There are Demo files in Demo folder
+### There are Demo files in Demo folder.
