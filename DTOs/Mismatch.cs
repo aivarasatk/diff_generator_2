@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace DiffGenerator2.DTOs
 {
-    public class ExcelBlockData
+    public class Mismatch
     {
         public string SheetName { get; set; }
-        public DateTime Date { get; set; }
-        public IEnumerable<ExcelProductData> ProductData { get; set; }
+        public DateTime BlockDate { get; set; }
+        public I07 EipData { get; set; }
+        public ExcelProductData ExcelData { get; set; }
+
     }
 }

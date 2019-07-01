@@ -20,7 +20,7 @@ namespace DiffGenerator2.Services
             _logService = logService ?? throw new ArgumentNullException(nameof(logService));
         }
 
-        public IEnumerable<string> GetAvailableSheetNames(string fileName)//TODO: ASYNC/AWAIT. this can take some time and blocks UI
+        public IEnumerable<string> GetAvailableSheetNames(string fileName)
         {
             var fileInfo = new FileInfo(fileName);
             _excelPackage = new ExcelPackage(fileInfo);
@@ -39,7 +39,8 @@ namespace DiffGenerator2.Services
                 throw new ArgumentNullException(nameof(_excelPackage));
             }
 
-            _logService.Information("Getting sheet navigations");
+            _logService.Information("Getting excel product data");
+
             var sheetNavigationDictionary = GetSheetNavigations(selectedSheets);
             foreach (var sheetNavigation in sheetNavigationDictionary)
             {
@@ -239,6 +240,7 @@ namespace DiffGenerator2.Services
 
             return new ExcelBlockData
             {
+                SheetName = sheetNavigation.Key,
                 Date = parasedBlockHeader,
                 ProductData = GetProductDataForBlock(sheet, sheetNavigation.Value, blockDataColumns, parasedBlockHeader)
             };

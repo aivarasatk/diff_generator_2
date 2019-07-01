@@ -17,6 +17,7 @@ namespace DiffGenerator2.Common
 
             builder.RegisterType<EipReader>().As<IEipReader>().InstancePerDependency();
             builder.RegisterType<ExcelReader>().As<IExcelReader>().InstancePerDependency();
+            builder.RegisterType<DiffGenerator>().As<IDiffGenerator>().InstancePerDependency();
             builder.RegisterType<CommandFactory>().As<ICommandFactory>().InstancePerDependency();
             builder.RegisterType<Command>().As<ICommand>().InstancePerDependency();
 
