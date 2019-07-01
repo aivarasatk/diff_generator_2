@@ -103,14 +103,16 @@
     <Compile Include="Constants\SheetNavigationIdentifiers.cs" />
     <Compile Include="Constants\UIDefault.cs" />
     <Compile Include="DTOs\BlockDataColumns.cs" />
-    <Compile Include="DTOs\EipDTO.cs" />
+    <Compile Include="DTOs\DiffReport.cs" />
     <Compile Include="DTOs\ExcelBlockData.cs" />
     <Compile Include="DTOs\ExcelProductData.cs" />
     <Compile Include="DTOs\I06.cs" />
     <Compile Include="DTOs\I07.cs" />
+    <Compile Include="DTOs\Mismatch.cs" />
     <Compile Include="DTOs\SheetNavigation.cs" />
     <Compile Include="Enums\FileSelect.cs" />
     <Compile Include="Interfaces\ICommandFactory.cs" />
+    <Compile Include="Interfaces\IDiffGenerator.cs" />
     <Compile Include="Interfaces\IEipReader.cs" />
     <Compile Include="Interfaces\IExcelReader.cs" />
     <Compile Include="Interfaces\ILifetimeService.cs" />
@@ -119,6 +121,7 @@
     <Compile Include="Model\MainModel.g.cs" />
     <Compile Include="Common\CommandFactory.cs" />
     <Compile Include="DTOs\SheetCheckBoxItem.cs" />
+    <Compile Include="Services\DiffGenerator.cs" />
     <Compile Include="Services\EipReader.cs" />
     <Compile Include="Services\ExcelReader.cs" />
     <Compile Include="Services\LifetimeService.cs" />

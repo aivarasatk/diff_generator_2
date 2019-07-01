@@ -17,7 +17,7 @@ namespace DiffGenerator2.Services
 
         public EipReader(ILogService logService)
         {
-            _logService = logService;
+            _logService = logService ?? throw new ArgumentNullException(nameof(logService));
         }
 
         private string[] ReadEipFile(string eipFileName)
@@ -34,8 +34,7 @@ namespace DiffGenerator2.Services
             }
             if (index == -1 && !string.IsNullOrWhiteSpace(input))
             {
-                _logService.Error($"Bad eip file: line doesn't have a pivot. Input: '{input}' Pivot: '{pivot}'");
-                throw new Exception("Bad eip file: line doesn't have a pivot but has non-whitespace symbols");
+                throw new Exception($"Bad eip file: line doesn't have a pivot. Input: '{input}' Pivot: '{pivot}'");
             }
             return input;
         }
@@ -53,7 +52,6 @@ namespace DiffGenerator2.Services
         {
             var prunedEipFile = string.Join("", PrunedEipFile(eipFileName));
 
-            //work with cleaned file contents
             _logService.Information($"Deserliazing eip file");
             try
             {

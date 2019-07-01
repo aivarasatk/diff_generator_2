@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -22,39 +23,46 @@ namespace DiffGenerator2.ViewModel
         private readonly ILifetimeService _lifetimeService;
         private readonly IExcelReader _excelReader;
         private readonly IEipReader _eipReader;
+        public readonly IDiffGenerator _diffGenerator;
         public MainModel Model { get; }
+        
+
         private ILogService _logService;
 
         public MainViewModel(ICommandFactory commandFactory, ILogService logService, ILifetimeService lifetimeService,
-                              IExcelReader excelReader, IEipReader eipReader)
+                              IExcelReader excelReader, IEipReader eipReader, IDiffGenerator diffGenerator)
         {
-            _commandFactory = commandFactory;
-            _logService = logService;
-            _lifetimeService = lifetimeService;
-            _excelReader = excelReader;
-            _eipReader = eipReader;
+            _commandFactory = commandFactory ?? throw new ArgumentNullException(nameof(commandFactory));
+            _logService = logService ?? throw new ArgumentNullException(nameof(logService));
+            _lifetimeService = lifetimeService ?? throw new ArgumentNullException(nameof(lifetimeService));
+            _excelReader = excelReader ?? throw new ArgumentNullException(nameof(excelReader));
+            _eipReader = eipReader ?? throw new ArgumentNullException(nameof(eipReader)); 
+            _diffGenerator = diffGenerator ?? throw new ArgumentNullException(nameof(diffGenerator));
+
             Model = new MainModel();
 
-            _logService.Information("PROGRAM STARTING!\n");
+            _logService.Information("PROGRAM STARTING!");
             InitComponents();
             Build();
         }
 
         private void Build()
         {
-            Model.SelectExcelFileCommand = _commandFactory.CreateCommand(() => SetExcelRelatedFields(FileSelect.Excel));
+            Model.SelectExcelFileCommand = _commandFactory.CreateCommand(async () => await SetExcelRelatedFields(FileSelect.Excel));
             Model.SelectEipFileCommand = _commandFactory.CreateCommand(() => SetSelectedFileName(FileSelect.Eip));
-            Model.ExecuteCommand = _commandFactory.CreateCommand(() => GenerateDiff());
+            Model.ExecuteCommand = _commandFactory.CreateCommand(async () => await GenerateDiff());
         }
 
-        private void SetExcelRelatedFields(FileSelect excel)
+        private async Task SetExcelRelatedFields(FileSelect excel)
         {
             Model.IsLoading = Visibility.Visible;
             SetSelectedFileName(excel);
 
             _logService.Information("Getting excel sheet names");
-            var excelSheetNames = _excelReader.GetAvailableSheetNames(Model.ExcelFileName);
-            
+            var excelSheetNames = new List<string>();
+            await Task.Run(() => {
+                excelSheetNames = _excelReader.GetAvailableSheetNames(Model.ExcelFileName).ToList();
+            });
             Model.SheetItems.Clear();
             _logService.Information("Creating checkboxes");
             foreach (var sheetName in excelSheetNames)
@@ -95,19 +103,25 @@ namespace DiffGenerator2.ViewModel
             return openFileDialog.ShowDialog() == true ? openFileDialog.FileName : null;
         }
 
-        private void GenerateDiff()
+        private async Task GenerateDiff()
         {
             try
             {
                 _logService.Information("Started generating diff");
-                var excelProductData = _excelReader.GetExcelProductData(Model.SheetItems.Where(item => item.IsChecked)).ToList();
+                Model.IsLoading = Visibility.Visible;
+                await Task.Run(() => {
+                    var excelProductData = _excelReader.GetExcelProductData(Model.SheetItems.Where(item => item.IsChecked));
+                    var eipData = _eipReader.GetEipContents(Model.EipFileName);
+                    var diffReport = _diffGenerator.GenerateDiffReport(eipData.ToList(), excelProductData.ToList());
+                });
 
-
+                Model.IsLoading = Visibility.Collapsed;
                 _logService.Information("Finished generating diff");
+                _logService.Information("");
             }
             catch(Exception ex)
             {
-                _logService.Error("Gerenate Diff error. ", ex);
+                _logService.Error("Generate Diff error. ", ex);
                 //show error to user.
                 throw;//TODO: REMOVE THROW WHEN USR ERROR IS COMPELETED
             }
