@@ -18,6 +18,9 @@ namespace DiffGenerator2.Model
         private Visibility _isLoading;
         private ObservableCollection<SheetCheckBoxItem> _sheetItems;
 
+        private string _error;
+        private List<string> _errors = new List<string>();
+
         public ICommand SelectExcelFileCommand { get; set; }
         public ICommand SelectEipFileCommand { get; set; }
         public ICommand ExecuteCommand { get; set; }
