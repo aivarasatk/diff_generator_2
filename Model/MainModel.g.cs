@@ -112,28 +112,58 @@ namespace DiffGenerator2.Model
         }
 
         #region IDataErrorInfo Members
-        public string Error => throw new NotImplementedException();
+        public static string ErrorPropertyName = "Error";
+
+        public string Error {
+            get { return _error; }
+
+            set
+            {
+                if (_error == value)
+                    return;
+
+                _error = value;
+                OnPropertyChanged(ErrorPropertyName);
+            }
+        }
 
         public string this[string columnName]
         {
             get
             {
-                string result = null;
-                if(columnName == "ExcelFileName")
+                var error = "";
+                switch (columnName)
                 {
-                    if (string.IsNullOrEmpty(ExcelFileName) || ExcelFileName == UIDefault.FileNotSelected)
+                    case "ExcelFileName":
                     {
-                        result = "Būtina pasirinkti Excelio failą";
+                        if (string.IsNullOrEmpty(ExcelFileName) || ExcelFileName == UIDefault.FileNotSelected)
+                        {
+                            error = "Būtina pasirinkti Excelio failą";
+                            _errors.Add(error);
+                        }
+                        else
+                        {
+                            _errors.Remove("Būtina pasirinkti Excelio failą");
+                        }
+                        break;
+                    }
+                    case "EipFileName":
+                    {
+                        if (string.IsNullOrEmpty(EipFileName) || EipFileName == UIDefault.FileNotSelected)
+                        {
+                            error = "Būtina pasirinkti Eip failą";
+                            _errors.Add(error);
+                        }
+                        else
+                        {
+                            _errors.Remove("Būtina pasirinkti Eip failą");
+                        }
+                        break;
                     }
                 }
-                if(columnName == "EipFileName")
-                {
-                    if (string.IsNullOrEmpty(EipFileName) || ExcelFileName == UIDefault.FileNotSelected)
-                    {
-                        result = "Būtina pasirinkti Eip failą";
-                    }
-                }
-                return result;
+                Error = string.Join("\n", _errors);
+                ExecuteEnabled = string.IsNullOrEmpty(Error);
+                return error;
             }
         }
         #endregion
