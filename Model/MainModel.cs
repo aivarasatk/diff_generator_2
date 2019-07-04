@@ -16,6 +16,7 @@ namespace DiffGenerator2.Model
         private string _eipFileName;
         private bool _executeEnabled;
         private Visibility _isLoading;
+        private Visibility _sheetSelectionVisibility;
         private ObservableCollection<SheetCheckBoxItem> _sheetItems;
 
         private string _error;

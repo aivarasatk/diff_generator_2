@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -111,6 +110,22 @@ namespace DiffGenerator2.Model
             }
         }
 
+        public static string SheetSelectionVisibilityPropertyName = "SheetSelectionVisibility";
+        public Visibility SheetSelectionVisibility
+        {
+            get
+            {
+                return _sheetSelectionVisibility;
+            }
+            set
+            {
+                if (_sheetSelectionVisibility == value)
+                    return;
+
+                _sheetSelectionVisibility = value;
+                OnPropertyChanged(SheetSelectionVisibilityPropertyName);
+            }
+        }
         #region IDataErrorInfo Members
         public static string ErrorPropertyName = "Error";
 
@@ -130,13 +145,13 @@ namespace DiffGenerator2.Model
         public string this[string columnName]
         {
             get
-            {
+            {             
                 var error = "";
                 switch (columnName)
                 {
                     case "ExcelFileName":
                     {
-                        if (string.IsNullOrEmpty(ExcelFileName) || ExcelFileName == UIDefault.FileNotSelected)
+                        if (!FileSelected(ExcelFileName))
                         {
                             error = "Būtina pasirinkti Excelio failą";
                             _errors.Add(error);
@@ -149,7 +164,7 @@ namespace DiffGenerator2.Model
                     }
                     case "EipFileName":
                     {
-                        if (string.IsNullOrEmpty(EipFileName) || EipFileName == UIDefault.FileNotSelected)
+                        if (!FileSelected(EipFileName))
                         {
                             error = "Būtina pasirinkti Eip failą";
                             _errors.Add(error);
@@ -165,6 +180,10 @@ namespace DiffGenerator2.Model
                 ExecuteEnabled = string.IsNullOrEmpty(Error);
                 return error;
             }
+        }
+        private bool FileSelected(string fileName)
+        {
+            return !string.IsNullOrEmpty(fileName) && fileName != UIDefault.FileNotSelected;
         }
         #endregion
 

@@ -57,14 +57,17 @@ namespace DiffGenerator2.ViewModel
         {
             Model.IsLoading = Visibility.Visible;
             SetSelectedFileName(excel);
-
             _logService.Information("Getting excel sheet names");
             var excelSheetNames = new List<string>();
             await Task.Run(() => {
                 excelSheetNames = _excelReader.GetAvailableSheetNames(Model.ExcelFileName).ToList();
             });
+            
             Model.SheetItems.Clear();
             _logService.Information("Creating checkboxes");
+
+            Model.SheetSelectionVisibility = FileSelected(Model.ExcelFileName) ? Visibility.Visible : Visibility.Collapsed;
+   
             foreach (var sheetName in excelSheetNames)
             {
                 Model.SheetItems.Add(new SheetCheckBoxItem
@@ -75,6 +78,12 @@ namespace DiffGenerator2.ViewModel
             }
             Model.IsLoading = Visibility.Collapsed;
         }
+
+        private bool FileSelected(string fileName)
+        {
+            return !string.IsNullOrEmpty(fileName) && fileName != UIDefault.FileNotSelected;
+        }
+
         private void SetSelectedFileName(FileSelect fileMode)
         {
             _logService.Information("Openning file select dialog with file mode filter: {Mode}", fileMode.ToString());
@@ -107,9 +116,15 @@ namespace DiffGenerator2.ViewModel
         {
             try
             {
+                if (Model.SheetItems.All(sheet => !sheet.IsChecked))
+                {
+                    MessageBox.Show("Nėra pasirinktų „Excel“ lapų", "Klaida", MessageBoxButton.OK);
+                    return;
+                }
                 _logService.Information("Started generating diff");
                 Model.IsLoading = Visibility.Visible;
-                await Task.Run(() => {
+                await Task.Run(() =>
+                {
                     var excelProductData = _excelReader.GetExcelProductData(Model.SheetItems.Where(item => item.IsChecked));
                     var eipData = _eipReader.GetEipContents(Model.EipFileName);
                     var diffReport = _diffGenerator.GenerateDiffReport(eipData.ToList(), excelProductData.ToList());
@@ -122,8 +137,7 @@ namespace DiffGenerator2.ViewModel
             catch(Exception ex)
             {
                 _logService.Error("Generate Diff error. ", ex);
-                //show error to user.
-                throw;//TODO: REMOVE THROW WHEN USR ERROR IS COMPELETED
+                MessageBox.Show($"Klaida generuojant nesutapimų ataskaitą:\n\"{ex.Message}\"","Klaida",MessageBoxButton.OK);                
             }
         }
 
@@ -132,6 +146,7 @@ namespace DiffGenerator2.ViewModel
             Model.ExcelFileName = UIDefault.FileNotSelected;
             Model.EipFileName = UIDefault.FileNotSelected;
             Model.ExecuteEnabled = true;
+            Model.SheetSelectionVisibility = Visibility.Collapsed;
             Model.IsLoading = Visibility.Collapsed;
         }
     }
