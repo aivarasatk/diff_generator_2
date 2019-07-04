@@ -137,7 +137,7 @@ namespace DiffGenerator2.ViewModel
             catch(Exception ex)
             {
                 _logService.Error("Generate Diff error. ", ex);
-                MessageBox.Show("Klaida generuojant nesutapimų ataskaitą","Klaida",MessageBoxButton.OK);                
+                MessageBox.Show($"Klaida generuojant nesutapimų ataskaitą:\n\"{ex.Message}\"","Klaida",MessageBoxButton.OK);                
             }
         }
 

@@ -8,7 +8,7 @@
         Title="DiffChecker2" Height="200" Width="450"
         SizeToContent="Height">
     <Window.Resources>
-        <Style x:Key="style1" TargetType="{x:Type TextBlock}">
+        <Style x:Key="errorMessageStyle" TargetType="{x:Type TextBlock}">
             <Setter Property="Foreground" Value="Red"/>
         </Style>
         <Style x:Key="errorStyle"
@@ -17,14 +17,6 @@
                 <Setter.Value>
                     <ControlTemplate>
                         <DockPanel LastChildFill="True">
-                            <TextBlock 
-                                DockPanel.Dock="Right" 
-                                Foreground="Red"
-                                TextAlignment="Center"
-                                TextWrapping="Wrap"                             
-                                FontWeight="Bold"
-                                >
-                            </TextBlock>
                             <Border BorderBrush="Red" BorderThickness="3">
                                 <AdornedElementPlaceholder Name="controlWithError"/>
                             </Border>
@@ -128,7 +120,7 @@
                 </Grid>
 
                 <Grid Grid.Row="4" >
-                    <TextBlock Style="{StaticResource style1}"  Text="{Binding Model.Error}"/>
+                    <TextBlock Style="{StaticResource errorMessageStyle}"  Text="{Binding Model.Error}"/>
                 </Grid>
             </Grid>
         </AdornerDecorator>
