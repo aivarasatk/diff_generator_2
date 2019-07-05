@@ -10,7 +10,7 @@ namespace DiffGenerator2.Constants
     {
         private static List<string> _colors = new List<string>
         {
-            "FFF0F0F0"
+            "FFF0F0F0", "FFFFFF00"
         };
 
         public static List<string> Colors { get { return _colors; } }

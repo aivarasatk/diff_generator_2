@@ -22,7 +22,7 @@ namespace DiffGenerator2.Services
 
         private string[] ReadEipFile(string eipFileName)
         {
-            return System.IO.File.ReadAllLines(eipFileName);
+            return System.IO.File.ReadAllLines(eipFileName, Encoding.GetEncoding("iso-8859-13"));
         }
 
         private string TruncateStringAfterChar(string input, char pivot)
@@ -51,12 +51,12 @@ namespace DiffGenerator2.Services
         public IEnumerable<I07> GetEipContents(string eipFileName)
         {
             var prunedEipFile = string.Join("", PrunedEipFile(eipFileName));
-
+            var fileWithEscapedChars = EscapeCharacters(prunedEipFile);
             _logService.Information($"Deserliazing eip file");
             try
             {
                 XmlSerializer xmlSerializer = new XmlSerializer(typeof(I06));
-                using (StringReader stringReader = new StringReader(prunedEipFile))
+                using (StringReader stringReader = new StringReader(fileWithEscapedChars))
                 {
                     return ((I06)xmlSerializer.Deserialize(stringReader)).I07;
                 }
@@ -66,6 +66,20 @@ namespace DiffGenerator2.Services
                 _logService.Error($"Deserializing failed",ex);
                 throw;
             }
+        }
+
+        private string EscapeCharacters(string prunedEipFile)
+        {
+            var charsToEscape = new char[]
+            {
+                '&'
+            };
+
+            foreach(var charToEscape in charsToEscape)
+            {
+                prunedEipFile = prunedEipFile.Replace(charToEscape.ToString(), "&amp;");
+            }
+            return prunedEipFile;
         }
     }
 }

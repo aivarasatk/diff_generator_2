@@ -17,7 +17,7 @@
                 <Setter.Value>
                     <ControlTemplate>
                         <DockPanel LastChildFill="True">
-                            <Border BorderBrush="Red" BorderThickness="3">
+                            <Border BorderBrush="Red" BorderThickness="2">
                                 <AdornedElementPlaceholder Name="controlWithError"/>
                             </Border>
                         </DockPanel>
@@ -119,8 +119,8 @@
                     <TextBlock Grid.Column="0"/>
                 </Grid>
 
-                <Grid Grid.Row="4" >
-                    <TextBlock Style="{StaticResource errorMessageStyle}"  Text="{Binding Model.Error}"/>
+                <Grid Grid.Row="4" Margin="5,10,0,0">
+                    <TextBlock Style="{StaticResource errorMessageStyle}"  Text="{Binding Model.Error}" FontWeight="Bold"/>
                 </Grid>
             </Grid>
         </AdornerDecorator>
