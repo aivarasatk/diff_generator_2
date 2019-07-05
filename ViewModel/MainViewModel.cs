@@ -21,26 +21,16 @@ namespace DiffGenerator2.ViewModel
     {
         private readonly ICommandFactory _commandFactory;
         private readonly ILifetimeService _lifetimeService;
-        private readonly IExcelReader _excelReader;
-        private readonly IEipReader _eipReader;
-        public readonly IDiffGenerator _diffGenerator;
-        public readonly IExcelReportGenerator _excelReportGenerator;
         public MainModel Model { get; }
         
 
         private ILogService _logService;
 
-        public MainViewModel(ICommandFactory commandFactory, ILogService logService, ILifetimeService lifetimeService,
-                              IExcelReader excelReader, IEipReader eipReader, IDiffGenerator diffGenerator,
-                              IExcelReportGenerator excelReportGenerator)
+        public MainViewModel(ICommandFactory commandFactory, ILogService logService, ILifetimeService lifetimeService)
         {
             _commandFactory = commandFactory ?? throw new ArgumentNullException(nameof(commandFactory));
             _logService = logService ?? throw new ArgumentNullException(nameof(logService));
             _lifetimeService = lifetimeService ?? throw new ArgumentNullException(nameof(lifetimeService));
-            _excelReader = excelReader ?? throw new ArgumentNullException(nameof(excelReader));
-            _eipReader = eipReader ?? throw new ArgumentNullException(nameof(eipReader)); 
-            _diffGenerator = diffGenerator ?? throw new ArgumentNullException(nameof(diffGenerator));
-            _excelReportGenerator = excelReportGenerator ?? throw new ArgumentNullException(nameof(excelReportGenerator));
 
             Model = new MainModel();
 
@@ -65,7 +55,10 @@ namespace DiffGenerator2.ViewModel
                 _logService.Information("Getting excel sheet names");
                 var excelSheetNames = new List<string>();
                 await Task.Run(() => {
-                    excelSheetNames = _excelReader.GetAvailableSheetNames(Model.ExcelFileName).ToList();
+                    excelSheetNames = _lifetimeService.ExecuteInLifetime<IEnumerable<string>, IExcelReader>(reader =>
+                    {
+                        return reader.GetAvailableSheetNames(Model.ExcelFileName);
+                    }).ToList();
                 });
             
                 Model.SheetItems.Clear();
@@ -155,9 +148,14 @@ namespace DiffGenerator2.ViewModel
         private Task<DiffReport> GetDiffReport()
         {
             return Task.Run(() => {
-                var excelProductData = _excelReader.GetExcelProductData(Model.SheetItems.Where(item => item.IsChecked));
-                var eipData = _eipReader.GetEipContents(Model.EipFileName);
-                return _diffGenerator.GenerateDiffReport(eipData.ToList(), excelProductData.ToList());
+                var excelProductData = _lifetimeService.ExecuteInLifetime<IEnumerable<ExcelBlockData>, IExcelReader>(
+                    reader =>  reader.GetExcelProductData(Model.SheetItems.Where(item => item.IsChecked)));
+
+                var eipData = _lifetimeService.ExecuteInLifetime<IEnumerable<I07>, IEipReader>(
+                    reader => reader.GetEipContents(Model.EipFileName));
+
+                return _lifetimeService.ExecuteInLifetime<DiffReport, IDiffGenerator>(
+                    reader => reader.GenerateDiffReport(eipData.ToList(), excelProductData.ToList()));
             });
         }
 
@@ -166,11 +164,8 @@ namespace DiffGenerator2.ViewModel
             return Task.Run(() =>
             {
                 _logService.Information("Start generating excel report");
-                _excelReportGenerator.GenerateReport(diffReport);
+                _lifetimeService.ExecuteInLifetime<IExcelReportGenerator>(generator => generator.GenerateReport(diffReport));
             });
-            //generate mismatch part
-            //generate missing from excel
-            //generate missing from eip
         }
 
         private void InitComponents()
