@@ -95,6 +95,7 @@
     <Compile Include="Common\Command.cs" />
     <Compile Include="Common\ContainerConfig.cs" />
     <Compile Include="Constants\ExcelDataBlockColumnNaming.cs" />
+    <Compile Include="Constants\ExcelReport.cs" />
     <Compile Include="Constants\ExcludedColors.cs" />
     <Compile Include="Constants\NamingSchemeSplitter.cs" />
     <Compile Include="Constants\SheetNavigationIdentifiers.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="Interfaces\IDiffGenerator.cs" />
     <Compile Include="Interfaces\IEipReader.cs" />
     <Compile Include="Interfaces\IExcelReader.cs" />
+    <Compile Include="Interfaces\IExcelReportGenerator.cs" />
     <Compile Include="Interfaces\ILifetimeService.cs" />
     <Compile Include="Interfaces\ILogService.cs" />
     <Compile Include="Model\MainModel.cs" />
@@ -121,6 +123,7 @@
     <Compile Include="Services\DiffGenerator.cs" />
     <Compile Include="Services\EipReader.cs" />
     <Compile Include="Services\ExcelReader.cs" />
+    <Compile Include="Services\ExcelReportGenerator.cs" />
     <Compile Include="Services\LifetimeService.cs" />
     <Compile Include="Services\LogService.cs" />
     <Compile Include="Services\LoggerBuilder.cs" />

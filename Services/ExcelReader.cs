@@ -377,6 +377,7 @@ namespace DiffGenerator2.Services
         private bool DefaultCellBackgroundColor(ExcelRange cell)
         {
             return cell.Style.Fill.BackgroundColor.Rgb == null
+                || cell.Style.Fill.BackgroundColor.Rgb == string.Empty
                 || ExcludedColors.Colors.Contains(cell.Style.Fill.BackgroundColor.Rgb);
         }
 
