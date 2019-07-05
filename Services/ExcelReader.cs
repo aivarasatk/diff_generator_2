@@ -13,7 +13,7 @@ namespace DiffGenerator2.Services
 {
     public class ExcelReader : IExcelReader
     {
-        private ExcelPackage _excelPackage;
+        private static ExcelPackage _excelPackage;
         private ILogService _logService;
         public ExcelReader(ILogService logService)
         {
@@ -22,8 +22,7 @@ namespace DiffGenerator2.Services
 
         public IEnumerable<string> GetAvailableSheetNames(string fileName)
         {
-            var fileInfo = new FileInfo(fileName);
-            _excelPackage = new ExcelPackage(fileInfo);
+            _excelPackage = GetExcelPackage(fileName);
 
             var workbook = _excelPackage.Workbook;
             foreach (var workSheet in workbook.Worksheets)
@@ -32,12 +31,9 @@ namespace DiffGenerator2.Services
             }
         }
 
-        public IEnumerable<ExcelBlockData> GetExcelProductData(IEnumerable<SheetCheckBoxItem> selectedSheets)
+        public IEnumerable<ExcelBlockData> GetExcelProductData(string fileName, IEnumerable<SheetCheckBoxItem> selectedSheets)
         {
-            if(_excelPackage == null)
-            {
-                throw new ArgumentNullException(nameof(_excelPackage));
-            }
+            _excelPackage = GetExcelPackage(fileName);
 
             _logService.Information("Getting excel product data");
 
@@ -53,6 +49,16 @@ namespace DiffGenerator2.Services
                     yield return GetBlockData(blockData, sheetNavigation);
                 }
             }
+        }
+
+        private ExcelPackage GetExcelPackage(string fileName)
+        {
+            if (_excelPackage == null)
+            {
+                var fileInfo = new FileInfo(fileName);
+                return new ExcelPackage(fileInfo);
+            }
+            return _excelPackage;
         }
         
 

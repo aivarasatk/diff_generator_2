@@ -10,6 +10,6 @@ namespace DiffGenerator2.Interfaces
     public interface IExcelReader
     {
         IEnumerable<string> GetAvailableSheetNames(string fileName);
-        IEnumerable<ExcelBlockData> GetExcelProductData(IEnumerable<SheetCheckBoxItem> sheetItems);
+        IEnumerable<ExcelBlockData> GetExcelProductData(string fileName, IEnumerable<SheetCheckBoxItem> sheetItems);
     }
 }
