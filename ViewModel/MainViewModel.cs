@@ -149,7 +149,7 @@ namespace DiffGenerator2.ViewModel
         {
             return Task.Run(() => {
                 var excelProductData = _lifetimeService.ExecuteInLifetime<IEnumerable<ExcelBlockData>, IExcelReader>(
-                    reader =>  reader.GetExcelProductData(Model.SheetItems.Where(item => item.IsChecked)));
+                    reader =>  reader.GetExcelProductData(Model.ExcelFileName, Model.SheetItems.Where(item => item.IsChecked)));
 
                 var eipData = _lifetimeService.ExecuteInLifetime<IEnumerable<I07>, IEipReader>(
                     reader => reader.GetEipContents(Model.EipFileName));

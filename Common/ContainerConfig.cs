@@ -16,7 +16,7 @@ namespace DiffGenerator2.Common
             builder.RegisterType<MainViewModel>().SingleInstance();
 
             builder.RegisterType<EipReader>().As<IEipReader>().InstancePerLifetimeScope();
-            builder.RegisterType<ExcelReader>().As<IExcelReader>().SingleInstance();
+            builder.RegisterType<ExcelReader>().As<IExcelReader>().InstancePerLifetimeScope();
             builder.RegisterType<DiffGenerator>().As<IDiffGenerator>().InstancePerLifetimeScope();
             builder.RegisterType<CommandFactory>().As<ICommandFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ExcelReportGenerator>().As<IExcelReportGenerator>().InstancePerLifetimeScope();
