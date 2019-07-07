@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiffGenerator2", "DiffGenerator2.csproj", "{79F82BE7-562B-48DB-A7C5-77F337A8F10E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "..\Tests\Tests.csproj", "{2C24D9F3-28A2-4966-9ED8-CB066D158249}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{2C24D9F3-28A2-4966-9ED8-CB066D158249}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
