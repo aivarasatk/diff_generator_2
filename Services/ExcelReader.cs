@@ -22,7 +22,8 @@ namespace DiffGenerator2.Services
 
         public IEnumerable<string> GetAvailableSheetNames(string fileName)
         {
-            _excelPackage = GetExcelPackage(fileName);
+            var fileInfo = new FileInfo(fileName);
+            _excelPackage = new ExcelPackage(fileInfo);
 
             var workbook = _excelPackage.Workbook;
             foreach (var workSheet in workbook.Worksheets)
