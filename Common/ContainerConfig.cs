@@ -20,6 +20,8 @@ namespace DiffGenerator2.Common
             builder.RegisterType<DiffGenerator>().As<IDiffGenerator>().InstancePerLifetimeScope();
             builder.RegisterType<CommandFactory>().As<ICommandFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ExcelReportGenerator>().As<IExcelReportGenerator>().InstancePerLifetimeScope();
+            builder.RegisterType<FileSelector>().As<IFileSelector>().InstancePerLifetimeScope();
+
             builder.RegisterType<Command>().As<ICommand>().InstancePerLifetimeScope();
 
             builder.RegisterType<LifetimeService>().As<ILifetimeService>().SingleInstance();

@@ -57,7 +57,7 @@ namespace DiffGenerator2.Services
             worksheet.SetValue(currRow, columnOffset, tableName);
             var tableNameRange = worksheet.Cells[currRow, columnOffset, currRow, columnOffset + ExcelReport.TableNameColumnSpan - 1];
             tableNameRange.Style.Font.Bold = true;
-            SetBackgroundColor(tableNameRange, ExcelReport.RowColoring());
+            SetBackgroundColor(tableNameRange, ExcelReport.RowColoring);
             ++currRow;
 
             //set table headers
@@ -69,8 +69,7 @@ namespace DiffGenerator2.Services
             {
                 worksheet.SetValue(currRow, columnOffset++, name);
             }
-
-            
+            headerRange.AutoFitColumns();
         }
 
         private void SetFilterForTable(ExcelWorksheet worksheet, int lastRow)
@@ -90,9 +89,17 @@ namespace DiffGenerator2.Services
 
                 var columnSpan = 0;
                 var errorCells = new List<Tuple<int, int>>();
-                foreach(var item in groupedMismatch.AsEnumerable())
+                var warningCells = new List<Tuple<int, int>>();
+                foreach (var item in groupedMismatch.AsEnumerable())
                 {
                     var currColumn = ExcelReport.ColumnOffset;
+
+                    worksheet.SetValue(addedRows, currColumn++, item.ExcelData.Maker);
+                    if (item.ExcelData.Maker != item.EipData.Maker)
+                    {
+                        errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
+                    }
+
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.Code);
                     if(item.ExcelData.Code != item.EipData.Code.First())
                     {
@@ -105,8 +112,8 @@ namespace DiffGenerator2.Services
                         errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
                     }
 
-                    worksheet.SetValue(addedRows, currColumn++, item.ExcelData.Maker);
-                    if (item.ExcelData.Maker != item.EipData.Maker)
+                    worksheet.SetValue(addedRows, currColumn++, item.ExcelData.AmountFirstHalf + item.ExcelData.AmountSecondHalf);
+                    if (item.ExcelData.AmountFirstHalf + item.ExcelData.AmountSecondHalf != item.EipData.Amount)
                     {
                         errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
                     }
@@ -117,19 +124,28 @@ namespace DiffGenerator2.Services
                         errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
                     }
 
-                    worksheet.SetValue(addedRows, currColumn++, item.ExcelData.AmountFirstHalf + item.ExcelData.AmountSecondHalf);
-                    if (item.ExcelData.AmountFirstHalf + item.ExcelData.AmountSecondHalf != item.EipData.Amount)
-                    {
-                        errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
-                    }
-
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.Details);
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.HasShapes ? "Taip" : "Ne");
+                    if (item.ExcelData.HasShapes)
+                    {
+                        warningCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
+                    }
+
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.CellBackgroundColors.Any() ? "Taip" : "Ne");
+                    if (item.ExcelData.CellBackgroundColors.Any())
+                    {
+                        warningCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
+                    }
 
                     columnSpan = currColumn - 1 - ExcelReport.ColumnOffset;
                     SetBorderAndBackgroundStyleForRange(worksheet.Cells[addedRows, ExcelReport.ColumnOffset, addedRows, columnSpan], addedRows % 2 != 0);
                     ++currColumn;//skip one column
+
+                    worksheet.SetValue(addedRows, currColumn++, item.EipData.Maker);
+                    if (item.ExcelData.Maker != item.EipData.Maker)
+                    {
+                        errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
+                    }
 
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.Code.First());
                     if (item.ExcelData.Code != item.EipData.Code.First())
@@ -143,20 +159,14 @@ namespace DiffGenerator2.Services
                         errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
                     }
 
-                    worksheet.SetValue(addedRows, currColumn++, item.EipData.Maker);
-                    if (item.ExcelData.Maker != item.EipData.Maker)
+                    worksheet.SetValue(addedRows, currColumn++, item.EipData.Amount);
+                    if (item.ExcelData.AmountFirstHalf + item.ExcelData.AmountSecondHalf != item.EipData.Amount)
                     {
                         errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
                     }
 
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.DateDateTime.ToString("yyyy-MM-dd"));
                     if (item.ExcelData.Date.ToString("yyyy-MM-dd") != item.EipData.DateDateTime.ToString("yyyy-MM-dd"))
-                    {
-                        errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
-                    }
-
-                    worksheet.SetValue(addedRows, currColumn++, item.EipData.Amount);
-                    if (item.ExcelData.AmountFirstHalf + item.ExcelData.AmountSecondHalf != item.EipData.Amount)
                     {
                         errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
                     }
@@ -168,18 +178,19 @@ namespace DiffGenerator2.Services
                     SetBorderAndBackgroundStyleForRange(worksheet.Cells[addedRows, ExcelReport.ColumnOffset, addedRows, columnSpan], addedRows % 2 != 0);
                     ++addedRows;
                 }
-                SetErrorColoring(worksheet, errorCells);
+                SetMismatchColoring(worksheet, errorCells, ExcelReport.ErrorColoring);
+                SetMismatchColoring(worksheet, warningCells, ExcelReport.WarningColoring);
                 ++addedRows;
             }
             return addedRows;
         }
 
-        private void SetErrorColoring(ExcelWorksheet worksheet, IEnumerable<Tuple<int,int>> errorCells)
+        private void SetMismatchColoring(ExcelWorksheet worksheet, IEnumerable<Tuple<int,int>> errorCells, Color coloring)
         {
             foreach(var error in errorCells)
             {
                 var cell = worksheet.Cells[error.Item1, error.Item2];
-                SetBackgroundColor(cell, ExcelReport.ErrorColoring());
+                SetBackgroundColor(cell, coloring);
             }
         }
 
@@ -190,14 +201,14 @@ namespace DiffGenerator2.Services
                 cell.Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 if (setBackgroundColor)
                 {
-                    SetBackgroundColor(cell, ExcelReport.RowColoring());
+                    SetBackgroundColor(cell, ExcelReport.RowColoring);
                 }        
             }
         }
 
         private void SetSeparator(ExcelRange range)
         {
-            SetBackgroundColor(range, ExcelReport.SeparatorColoring());
+            SetBackgroundColor(range, ExcelReport.SeparatorColoring);
         }
 
         private void SetMissingFromEipHeader(ExcelWorksheet worksheet, int currenRow)
@@ -219,11 +230,11 @@ namespace DiffGenerator2.Services
             {
                 var currColumn = ExcelReport.EipDataStartColumn;
 
+                worksheet.SetValue(lastRow, currColumn++, item.Maker);
                 worksheet.SetValue(lastRow, currColumn++, item.Code.First());
                 worksheet.SetValue(lastRow, currColumn++, item.Name);
-                worksheet.SetValue(lastRow, currColumn++, item.Maker);
-                worksheet.SetValue(lastRow, currColumn++, item.DateDateTime.ToString("yyyy-MM-dd"));
                 worksheet.SetValue(lastRow, currColumn++, item.Amount);
+                worksheet.SetValue(lastRow, currColumn++, item.DateDateTime.ToString("yyyy-MM-dd"));
                 worksheet.SetValue(lastRow, currColumn++, item.Details1);
                 worksheet.SetValue(lastRow, currColumn++, item.Details2);
 
@@ -242,11 +253,11 @@ namespace DiffGenerator2.Services
             {
                 var currColumn = ExcelReport.ColumnOffset;
 
+                worksheet.SetValue(lastRow, currColumn++, item.Maker);
                 worksheet.SetValue(lastRow, currColumn++, item.Code);
                 worksheet.SetValue(lastRow, currColumn++, item.Name);
-                worksheet.SetValue(lastRow, currColumn++, item.Maker);
-                worksheet.SetValue(lastRow, currColumn++, item.Date.ToString("yyyy-MM-dd"));
                 worksheet.SetValue(lastRow, currColumn++, item.AmountFirstHalf + item.AmountSecondHalf);
+                worksheet.SetValue(lastRow, currColumn++, item.Date.ToString("yyyy-MM-dd"));
                 worksheet.SetValue(lastRow, currColumn++, item.Details);
 
                 var range = worksheet.Cells[lastRow,

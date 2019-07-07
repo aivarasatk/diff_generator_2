@@ -65,7 +65,7 @@ namespace DiffGenerator2.ViewModel
                 _logService.Information("Creating checkboxes");
 
                 Model.SheetSelectionVisibility = FileSelected(Model.ExcelFileName) ? Visibility.Visible : Visibility.Collapsed;
-   
+
                 foreach (var sheetName in excelSheetNames)
                 {
                     Model.SheetItems.Add(new SheetCheckBoxItem
@@ -110,24 +110,20 @@ namespace DiffGenerator2.ViewModel
 
         private string GetSelectedFile(string filter)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog
-            {
-                Filter = filter
-            };
-            return openFileDialog.ShowDialog() == true ? openFileDialog.FileName : null;
+            return _lifetimeService.ExecuteInLifetime<string, IFileSelector>(selector => selector.GetSelectedFile(filter));
         }
 
         private async Task GenerateDiff()
         {
             try
             {
-                Model.IsLoading = Visibility.Visible;
                 if (Model.SheetItems.All(sheet => !sheet.IsChecked))
                 {
                     MessageBox.Show("Nėra pasirinktų „Excel“ lapų", "Klaida", MessageBoxButton.OK, MessageBoxImage.Information);
-                    Model.IsLoading = Visibility.Collapsed;
                     return;
                 }
+
+                Model.IsLoading = Visibility.Visible;
                 _logService.Information("Started generating diff");
                 var diffReport = await GetDiffReport();
                 await GenerateExcelReport(diffReport);
@@ -152,7 +148,10 @@ namespace DiffGenerator2.ViewModel
                     reader =>  reader.GetExcelProductData(Model.ExcelFileName, Model.SheetItems.Where(item => item.IsChecked)));
 
                 var eipData = _lifetimeService.ExecuteInLifetime<IEnumerable<I07>, IEipReader>(
-                    reader => reader.GetEipContents(Model.EipFileName));
+                    reader => {
+                        var content = reader.GetEipContents(Model.EipFileName);
+                        return reader.GetParsedEipContents(content);
+                    });
 
                 return _lifetimeService.ExecuteInLifetime<DiffReport, IDiffGenerator>(
                     reader => reader.GenerateDiffReport(eipData.ToList(), excelProductData.ToList()));
@@ -172,7 +171,7 @@ namespace DiffGenerator2.ViewModel
         {
             Model.ExcelFileName = UIDefault.FileNotSelected;
             Model.EipFileName = UIDefault.FileNotSelected;
-            Model.ExecuteEnabled = true;
+            Model.ExecuteEnabled = false;
             Model.SheetSelectionVisibility = Visibility.Collapsed;
             Model.IsLoading = Visibility.Collapsed;
         }

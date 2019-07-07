@@ -21,9 +21,10 @@ namespace DiffGenerator2.Constants
         public const int EipDataStartColumn = ColumnOffset + ExcelProductColumnSpan + ColumnSpanBetweenTables;
         public const int DataEndColumn = ColumnOffset + ExcelProductColumnSpan + ColumnSpanBetweenTables + EipProductColumnSpan;
 
-        public static Color RowColoring() => Color.LightGray;
-        public static Color ErrorColoring() => Color.Red;
-        public static Color SeparatorColoring() => Color.Yellow;
+        public static readonly Color RowColoring = Color.LightGray;
+        public static readonly Color ErrorColoring =  Color.Red;
+        public static readonly Color WarningColoring = Color.DarkOrange;
+        public static readonly Color SeparatorColoring = Color.Yellow;
 
         public const string ExcelTable = "GP planas (Excelis)";
         public const string EipTable = "GEN planas (Rivilė)";

@@ -114,6 +114,7 @@
     <Compile Include="Interfaces\IEipReader.cs" />
     <Compile Include="Interfaces\IExcelReader.cs" />
     <Compile Include="Interfaces\IExcelReportGenerator.cs" />
+    <Compile Include="Interfaces\IFileSelector.cs" />
     <Compile Include="Interfaces\ILifetimeService.cs" />
     <Compile Include="Interfaces\ILogService.cs" />
     <Compile Include="Model\MainModel.cs" />
@@ -124,6 +125,7 @@
     <Compile Include="Services\EipReader.cs" />
     <Compile Include="Services\ExcelReader.cs" />
     <Compile Include="Services\ExcelReportGenerator.cs" />
+    <Compile Include="Services\FileSelector.cs" />
     <Compile Include="Services\LifetimeService.cs" />
     <Compile Include="Services\LogService.cs" />
     <Compile Include="Services\LoggerBuilder.cs" />
