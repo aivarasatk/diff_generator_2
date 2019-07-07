@@ -10,6 +10,7 @@ namespace DiffGenerator2.Interfaces
 {
     public interface IEipReader
     {
-        IEnumerable<I07> GetEipContents(string eipFileName);
+        IEnumerable<I07> GetParsedEipContents(IEnumerable<string> content);
+        string[] GetEipContents(string eipFileName);
     }
 }

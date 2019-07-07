@@ -1,4 +1,5 @@
-﻿using DiffGenerator2.DTOs;
+﻿using DiffGenerator2.Constants;
+using DiffGenerator2.DTOs;
 using DiffGenerator2.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,11 @@ namespace DiffGenerator2.Services
                     var eipProduct = eipData.FirstOrDefault(data => data.Code.First() == excelProduct.Code 
                                                                  && data.DateDateTime.Year == excelProduct.Date.Year
                                                                  && data.DateDateTime.Month == excelProduct.Date.Month);
-                    if(eipProduct == null)
+                    if(ProductIsFinished(eipProduct, excelProduct.CellBackgroundColors))
+                    {
+                        continue;
+                    }
+                    else if(eipProduct == null)
                     {
                         excelProductsMissingFromEip.Add(excelProduct);
                         continue;
@@ -59,12 +64,17 @@ namespace DiffGenerator2.Services
             };
         }
 
+        private bool ProductIsFinished(I07 eipProduct, IEnumerable<string> cellBackgroundColors)
+        {
+            return eipProduct == null && cellBackgroundColors.Any(c => ExcludedColors.MarkedInExcelAsDone.Contains(c));
+        }
+
         private bool HasMismatch(ExcelProductData excelProduct, I07 eipProduct)
         {
             return excelProduct.AmountFirstHalf + excelProduct.AmountSecondHalf != eipProduct.Amount
-                || excelProduct.Maker != eipProduct.Maker
-                || excelProduct.Name != eipProduct.Name
-                || excelProduct.Date.Day != eipProduct.DateDateTime.Day;
+            || excelProduct.Maker != eipProduct.Maker
+            || excelProduct.Name != eipProduct.Name
+            || excelProduct.Date.Day != eipProduct.DateDateTime.Day;
         }
     }
 }

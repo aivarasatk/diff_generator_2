@@ -29,7 +29,7 @@ namespace DiffGenerator2.Services
             }
             catch (Exception ex)
             {
-                _logService.Error("Exception during lifetime execution", ex);
+                _logService.Error("Exception during void lifetime execution", ex);
                 throw;
             }
             
@@ -46,7 +46,7 @@ namespace DiffGenerator2.Services
             }
             catch (Exception ex)
             {
-                _logService.Error("Exception during lifetime execution", ex);
+                _logService.Error("Exception during value lifetime execution", ex);
                 throw;
             }
         }

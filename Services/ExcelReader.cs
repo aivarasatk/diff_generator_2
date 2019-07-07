@@ -291,13 +291,25 @@ namespace DiffGenerator2.Services
                     continue;
                 }
 
+                var amountFirstHalf = 0;
+                var amountSecondHalf = 0;
+                try
+                {
+                    amountFirstHalf = amountFirstHalfCell.GetValue<int>();
+                    amountSecondHalf = amountSecondHalfCell.GetValue<int>();
+                }
+                catch(Exception ex)
+                {
+                    throw new FormatException($"Failed to parse amount for {sheet.Name} {blockDateHeader.ToString("yyyy-MM-dd")} {code} {name} ", ex);
+                }
+
                 yield return new ExcelProductData
                 {
                     Maker = maker,
                     Code = code,
                     Name = name,
-                    AmountFirstHalf = amountFirstHalfCell.GetValue<int>(),
-                    AmountSecondHalf = amountSecondHalfCell.GetValue<int>(),
+                    AmountFirstHalf = amountFirstHalf,
+                    AmountSecondHalf = amountSecondHalf,
                     Date = SetProductDate(dateCell, amountFirstHalfCell, amountSecondHalfCell, blockDateHeader),
                     Details = commentsCell.GetValue<string>(),
                     Comments = cellComments,

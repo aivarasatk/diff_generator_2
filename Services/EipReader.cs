@@ -19,12 +19,7 @@ namespace DiffGenerator2.Services
         {
             _logService = logService ?? throw new ArgumentNullException(nameof(logService));
         }
-
-        private string[] ReadEipFile(string eipFileName)
-        {
-            return System.IO.File.ReadAllLines(eipFileName, Encoding.GetEncoding("iso-8859-13"));
-        }
-
+        
         private string TruncateStringAfterChar(string input, char pivot)
         {
             int index = input.IndexOf(pivot);
@@ -39,18 +34,14 @@ namespace DiffGenerator2.Services
             return input;
         }
 
-        private IEnumerable<string> PrunedEipFile(string eipFileName)
+        public string[] GetEipContents(string eipFileName)
         {
-            var lines = ReadEipFile(eipFileName);
-            foreach (string line in lines)
-            {
-                yield return TruncateStringAfterChar(line, '<');
-            }
-        }
+            return File.ReadAllLines(eipFileName, Encoding.GetEncoding("iso-8859-13"));
+        }              
 
-        public IEnumerable<I07> GetEipContents(string eipFileName)
+        public IEnumerable<I07> GetParsedEipContents(IEnumerable<string> content)
         {
-            var prunedEipFile = string.Join("", PrunedEipFile(eipFileName));
+            var prunedEipFile = string.Join("", PrunedEipFile(content));
             var fileWithEscapedChars = EscapeCharacters(prunedEipFile);
             _logService.Information($"Deserliazing eip file");
             try
@@ -65,6 +56,14 @@ namespace DiffGenerator2.Services
             {
                 _logService.Error($"Deserializing failed",ex);
                 throw;
+            }
+        }
+
+        private IEnumerable<string> PrunedEipFile(IEnumerable<string> lines)
+        {
+            foreach (string line in lines)
+            {
+                yield return TruncateStringAfterChar(line, '<');
             }
         }
 

@@ -8,11 +8,14 @@ namespace DiffGenerator2.Constants
 {
     public static class ExcludedColors
     {
-        private static List<string> _colors = new List<string>
+        public static readonly List<string> Colors = new List<string>
         {
             "FFF0F0F0", "FFFFFF00"
         };
 
-        public static List<string> Colors { get { return _colors; } }
+        public static readonly List<string> MarkedInExcelAsDone = new List<string>
+        {
+            "FF008000"
+        };
     }
 }
