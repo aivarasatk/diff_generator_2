@@ -13,13 +13,15 @@ The app scans the excel file based on the navigation (in line 2).<br>
 * First part of the navigation info is the GP, KD-x-x and PP. Which tell in which columns are the following columns located:
 Maker ("Gamintojas"), Code ("Kodas"), Name ("Preparato Pavadinimas"). The numbers next to KD tell in which rows are the block headers
  e.g. "Geguze 2019" and where does the actual data starts. "KD-3-5" means that on third row are block headers, and on row 5 the actual data starts.
-* Second part tells the program which blocks to read, and which column is which field. (#KIEKIS1, #KIEKIS2 etc.)
+* Second part tells the program which blocks to read, and which column is which field. (#KIEKIS1, #KIEKIS2 etc.) END keyword denotes the end of blocks to read.
 <br>
 Products selected for mismatch evaluation are those that meet any of the criteria:
+
 * Any of the fields have values
 * Any of the fields have shapes (mostly arrows)
 * Any of the fields have colored backgrounds (excluding the default colors, in the demo files its only the slighly gray color)
-<br><br>
+
+<br>
 The app also parses the .eip file. This process is pretty straight forward - prepare the file for serialization, serialize.
 <br><br>
 After scanning the required files an excel difference report is generated under Reports/ folder.
