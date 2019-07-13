@@ -33,3 +33,12 @@ After scanning the required files an excel difference report is generated under 
 
 ## Demo
 Demo files are in the Demo folder. One for Excel and one .eip. Once the files and sheets are selected in the app pressing "Vykdyti" will generate the report under Report folder in current app directory. In the report you will see mismatches for May and June, as they are selected in the excel. Report highlighs in red the fields that do not match and also prints out those that are in excel but not in eip and vice versa.
+
+## UI demo
+![InitialScreen](Demo/demo1.png)
+![SelectingExcel](Demo/demo2.png)
+![ExcelSelectResult](Demo/demo3.png)
+![EipSelectResult](Demo/demo4.png)
+![ReportGeneratingResult](Demo/demo5.png)
+![ReportExample](Demo/demo6.png)
+[DemoReport](Demo/demo_excel.xlsx)
