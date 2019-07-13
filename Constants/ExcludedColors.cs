@@ -10,12 +10,12 @@ namespace DiffGenerator2.Constants
     {
         public static readonly List<string> Colors = new List<string>
         {
-            "FFF0F0F0", "FFFFFF00"
+            "FFF0F0F0", "FFFFFF00"//light gray and orange
         };
 
         public static readonly List<string> MarkedInExcelAsDone = new List<string>
         {
-            "FF008000"
+            "FF008000"//green
         };
     }
 }

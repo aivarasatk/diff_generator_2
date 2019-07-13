@@ -24,9 +24,10 @@ namespace DiffGenerator2.Services
             using (var excelPackage = new ExcelPackage(fileInfo))
             {
                 var worksheet = excelPackage.Workbook.Worksheets.Add("report");
+
                 InitializeTableHeaders(worksheet);
                 var lastRow = GenerateMismatchPart(worksheet, diffReport.Mismatches);
-                SetFilterForTable(worksheet, lastRow - 1);
+                SetFilterForTable(worksheet, lastRow - 1);//filtering only mismatches
 
                 SetSeparator(worksheet.Cells[lastRow, ExcelReport.ColumnOffset, lastRow, ExcelReport.DataEndColumn -1]);
                 SetMissingFromEipHeader(worksheet, ++lastRow);
@@ -95,81 +96,51 @@ namespace DiffGenerator2.Services
                     var currColumn = ExcelReport.ColumnOffset;
 
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.Maker);
-                    if (item.ExcelData.Maker != item.EipData.Maker)
-                    {
-                        errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
-                    }
+                    errorCells.Add(item.ExcelData.Maker != item.EipData.Maker? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.Code);
-                    if(item.ExcelData.Code != item.EipData.Code.First())
-                    {
-                        errorCells.Add(new Tuple<int,int>(addedRows, currColumn -1));
-                    }
+                    errorCells.Add(item.ExcelData.Code != item.EipData.Code.First() ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.Name);
-                    if (item.ExcelData.Name != item.EipData.Name)
-                    {
-                        errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
-                    }
+                    errorCells.Add(item.ExcelData.Name != item.EipData.Name ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.AmountFirstHalf + item.ExcelData.AmountSecondHalf);
-                    if (item.ExcelData.AmountFirstHalf + item.ExcelData.AmountSecondHalf != item.EipData.Amount)
-                    {
-                        errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
-                    }
+                    var amountsNotEqual = item.ExcelData.AmountFirstHalf + item.ExcelData.AmountSecondHalf != item.EipData.Amount;
+                    errorCells.Add(amountsNotEqual ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.Date.ToString("yyyy-MM-dd"));
-                    if (item.ExcelData.Date.ToString("yyyy-MM-dd") != item.EipData.DateDateTime.ToString("yyyy-MM-dd"))
-                    {
-                        errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
-                    }
+                    var datesDontMatch = item.ExcelData.Date.ToString("yyyy-MM-dd") != item.EipData.DateDateTime.ToString("yyyy-MM-dd");
+                    errorCells.Add(datesDontMatch ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.Details);
+
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.HasShapes ? "Taip" : "Ne");
-                    if (item.ExcelData.HasShapes)
-                    {
-                        warningCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
-                    }
+                    warningCells.Add(item.ExcelData.HasShapes ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.CellBackgroundColors.Any() ? "Taip" : "Ne");
-                    if (item.ExcelData.CellBackgroundColors.Any())
-                    {
-                        warningCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
-                    }
+                    warningCells.Add(item.ExcelData.CellBackgroundColors.Any() ? CellLocation(addedRows, currColumn - 1) : null);
 
+                    //style columns before separator
                     columnSpan = currColumn - 1 - ExcelReport.ColumnOffset;
                     SetBorderAndBackgroundStyleForRange(worksheet.Cells[addedRows, ExcelReport.ColumnOffset, addedRows, columnSpan], addedRows % 2 != 0);
                     ++currColumn;//skip one column
 
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.Maker);
-                    if (item.ExcelData.Maker != item.EipData.Maker)
-                    {
-                        errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
-                    }
+                    errorCells.Add(item.ExcelData.Maker != item.EipData.Maker ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.Code.First());
-                    if (item.ExcelData.Code != item.EipData.Code.First())
-                    {
-                        errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
-                    }
+                    errorCells.Add(item.ExcelData.Code != item.EipData.Code.First() ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.Name);
-                    if (item.ExcelData.Name != item.EipData.Name)
-                    {
-                        errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
-                    }
+                    errorCells.Add(item.ExcelData.Name != item.EipData.Name ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.Amount);
-                    if (item.ExcelData.AmountFirstHalf + item.ExcelData.AmountSecondHalf != item.EipData.Amount)
-                    {
-                        errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
-                    }
+                    amountsNotEqual = item.ExcelData.AmountFirstHalf + item.ExcelData.AmountSecondHalf != item.EipData.Amount;
+                    errorCells.Add(amountsNotEqual ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.DateDateTime.ToString("yyyy-MM-dd"));
-                    if (item.ExcelData.Date.ToString("yyyy-MM-dd") != item.EipData.DateDateTime.ToString("yyyy-MM-dd"))
-                    {
-                        errorCells.Add(new Tuple<int, int>(addedRows, currColumn - 1));
-                    }
+                    datesDontMatch = item.ExcelData.Date.ToString("yyyy-MM-dd") != item.EipData.DateDateTime.ToString("yyyy-MM-dd");
+                    errorCells.Add(datesDontMatch ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.Details1);
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.Details2);
@@ -178,11 +149,16 @@ namespace DiffGenerator2.Services
                     SetBorderAndBackgroundStyleForRange(worksheet.Cells[addedRows, ExcelReport.ColumnOffset, addedRows, columnSpan], addedRows % 2 != 0);
                     ++addedRows;
                 }
-                SetMismatchColoring(worksheet, errorCells, ExcelReport.ErrorColoring);
-                SetMismatchColoring(worksheet, warningCells, ExcelReport.WarningColoring);
+                SetMismatchColoring(worksheet, errorCells.Where(cell => cell != null), ExcelReport.ErrorColoring);
+                SetMismatchColoring(worksheet, warningCells.Where(cell => cell != null), ExcelReport.WarningColoring);
                 ++addedRows;
             }
             return addedRows;
+        }
+
+        private Tuple<int, int> CellLocation(int currRow, int currColumn)
+        {
+            return new Tuple<int, int>(currRow, currColumn);
         }
 
         private void SetMismatchColoring(ExcelWorksheet worksheet, IEnumerable<Tuple<int,int>> errorCells, Color coloring)
