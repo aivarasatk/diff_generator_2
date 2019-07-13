@@ -59,6 +59,7 @@ namespace Tests
             //assess
             mainViewModel.Model.SelectExcelFileCommand.Execute(null);
             Thread.Sleep(1000);//SUPER YUCKY WAY TO BYPASS AWAIT IN COMMAND
+            //this happens because of async void command
 
             //assert
             Assert.IsTrue(mainViewModel.Model.SheetSelectionVisibility == Visibility.Visible);
