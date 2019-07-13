@@ -35,13 +35,14 @@ namespace DiffGenerator2.Services
                                                                  && data.DateDateTime.Month == excelProduct.Date.Month);
                     if(ProductIsFinished(eipProduct, excelProduct.CellBackgroundColors))
                     {
-                        continue;
+                        continue;//do not generate mismatch because its missing for a valid reason
                     }
-                    else if(eipProduct == null)
+                    else if(!ExcelProductIsFoundInEip(eipProduct))
                     {
                         excelProductsMissingFromEip.Add(excelProduct);
-                        continue;
+                        continue;//do not generate mismatch, since its missing
                     }
+
                     existingEipProductsInExcel.Add(eipProduct);
                     if(HasMismatch(excelProduct, eipProduct))
                     {
@@ -63,6 +64,8 @@ namespace DiffGenerator2.Services
                 ProductsMissingFromExcel = eipData.Where(e => !existingEipProductsInExcel.Contains(e))
             };
         }
+
+        private bool ExcelProductIsFoundInEip(I07 eipProduct) => eipProduct != null;
 
         private bool ProductIsFinished(I07 eipProduct, IEnumerable<string> cellBackgroundColors)
         {

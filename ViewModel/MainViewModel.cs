@@ -42,7 +42,7 @@ namespace DiffGenerator2.ViewModel
         private void Build()
         {
             Model.SelectExcelFileCommand = _commandFactory.CreateCommand(async () => await SetExcelRelatedFields(FileSelect.Excel));
-            Model.SelectEipFileCommand = _commandFactory.CreateCommand(() => SetSelectedFileName(FileSelect.Eip));
+            Model.SelectEipFileCommand = _commandFactory.CreateCommand(() => SetEipRelatedFields(FileSelect.Eip));
             Model.ExecuteCommand = _commandFactory.CreateCommand(async () => await GenerateDiff());
         }
 
@@ -53,12 +53,10 @@ namespace DiffGenerator2.ViewModel
             {
                 SetSelectedFileName(excel);
                 _logService.Information("Getting excel sheet names");
-                var excelSheetNames = new List<string>();
-                await Task.Run(() => {
-                    excelSheetNames = _lifetimeService.ExecuteInLifetime<IEnumerable<string>, IExcelReader>(reader =>
-                    {
-                        return reader.GetAvailableSheetNames(Model.ExcelFileName);
-                    }).ToList();
+                var excelSheetNames = await Task.Run(() =>
+                {
+                    return _lifetimeService.ExecuteInLifetime<IEnumerable<string>, IExcelReader>(
+                        reader => reader.GetAvailableSheetNames(Model.ExcelFileName)).ToList();
                 });
             
                 Model.SheetItems.Clear();
@@ -80,13 +78,26 @@ namespace DiffGenerator2.ViewModel
             {
                 _logService.Error("Failed to finish displaying sheets to select. ", ex);
                 Model.IsLoading = Visibility.Collapsed;
-                MessageBox.Show($"Klaida, kuriant \"Excel\" lapų pasirinkimą:\n\"{ex.Message}\"", "Klaida", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"Klaida, kuriant \"Excel\" lapų pasirinkimą:\n\"{ex.Message}\"", "Klaida", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private bool FileSelected(string fileName)
         {
             return !string.IsNullOrEmpty(fileName) && fileName != UIDefault.FileNotSelected;
+        }
+
+        private void SetEipRelatedFields(FileSelect eipMode)
+        {
+            try
+            {
+                SetSelectedFileName(eipMode);
+            }
+            catch(Exception ex)
+            {
+                _logService.Error($"Failed to select eip file", ex);
+                MessageBox.Show($"Klaida, pasirenkant .eip failą:\n\"{ex.Message}\"", "Klaida", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void SetSelectedFileName(FileSelect fileMode)
@@ -103,7 +114,7 @@ namespace DiffGenerator2.ViewModel
                     _logService.Information("File selected {FileName}", Model.EipFileName);
                     break;
                 default:
-                    break;
+                    throw new ArgumentException($"FileSelect enum does not contain {fileMode} value");
 
             }
         }
