@@ -9,9 +9,9 @@ namespace DiffGenerator2.Constants
 {
     public static class ExcelReport
     {
-        public const int ColumnOffset = 2;// zero based
-        public const int HeaderStartRowOffset = 2;// zero based
-        public const int DataStartRowOffset = 5;// zero based
+        public const int ColumnOffset = 2;
+        public const int HeaderStartRowOffset = 2;
+        public const int DataStartRowOffset = 5;
         public const int ExcelProductColumnSpan = 8;
         public const int EipProductColumnSpan = 7;
         public const int ColumnSpanBetweenTables = 1;
@@ -55,5 +55,11 @@ namespace DiffGenerator2.Constants
 
         public const string ProductsMissingFromExcel = "Užsakymai, kurių nėra GP plane(Excel)";
         public const string ProductsMissingFromEip = "Užsakymai, kurių nėra GEN plane (Rivilėje)";
+
+        public const string HasShapes = "Taip";
+        public const string DoesNotHaveShapes = "Ne";
+
+        public const string HasBgColors = "Taip";
+        public const string DoesNotHaveBgColors = "Ne";
     }
 }
