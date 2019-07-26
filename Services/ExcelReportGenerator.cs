@@ -75,7 +75,8 @@ namespace DiffGenerator2.Services
 
         private void SetFilterForTable(ExcelWorksheet worksheet, int lastRow)
         {
-            worksheet.Cells[ExcelReport.DataStartRowOffset - 1, ExcelReport.ColumnOffset, lastRow, ExcelReport.DataEndColumn - 1]
+            var rowAboveData = ExcelReport.DataStartRowOffset - 1;
+            worksheet.Cells[rowAboveData, ExcelReport.ColumnOffset, lastRow, ExcelReport.DataEndColumn - 1]
                      .AutoFilter = true;
         }
 
@@ -89,36 +90,36 @@ namespace DiffGenerator2.Services
                 worksheet.SetValue(addedRows++, ExcelReport.ColumnOffset, groupedMismatch.Key);
 
                 var columnSpan = 0;
-                var errorCells = new List<Tuple<int, int>>();
-                var warningCells = new List<Tuple<int, int>>();
+                var potentialErrorCells = new List<Tuple<int, int>>();
+                var potentialWarningCells = new List<Tuple<int, int>>();
                 foreach (var item in groupedMismatch.AsEnumerable())
                 {
                     var currColumn = ExcelReport.ColumnOffset;
 
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.Maker);
-                    errorCells.Add(item.ExcelData.Maker != item.EipData.Maker? CellLocation(addedRows, currColumn - 1) : null);
+                    potentialErrorCells.Add(item.ExcelData.Maker != item.EipData.Maker? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.Code);
-                    errorCells.Add(item.ExcelData.Code != item.EipData.Code.First() ? CellLocation(addedRows, currColumn - 1) : null);
+                    potentialErrorCells.Add(item.ExcelData.Code != item.EipData.Code.First() ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.Name);
-                    errorCells.Add(item.ExcelData.Name != item.EipData.Name ? CellLocation(addedRows, currColumn - 1) : null);
+                    potentialErrorCells.Add(item.ExcelData.Name != item.EipData.Name ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.AmountFirstHalf + item.ExcelData.AmountSecondHalf);
                     var amountsNotEqual = item.ExcelData.AmountFirstHalf + item.ExcelData.AmountSecondHalf != item.EipData.Amount;
-                    errorCells.Add(amountsNotEqual ? CellLocation(addedRows, currColumn - 1) : null);
+                    potentialErrorCells.Add(amountsNotEqual ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.Date.ToString("yyyy-MM-dd"));
                     var datesDontMatch = item.ExcelData.Date.ToString("yyyy-MM-dd") != item.EipData.DateDateTime.ToString("yyyy-MM-dd");
-                    errorCells.Add(datesDontMatch ? CellLocation(addedRows, currColumn - 1) : null);
+                    potentialErrorCells.Add(datesDontMatch ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.ExcelData.Details);
 
-                    worksheet.SetValue(addedRows, currColumn++, item.ExcelData.HasShapes ? "Taip" : "Ne");
-                    warningCells.Add(item.ExcelData.HasShapes ? CellLocation(addedRows, currColumn - 1) : null);
+                    worksheet.SetValue(addedRows, currColumn++, item.ExcelData.HasShapes ? ExcelReport.HasShapes: ExcelReport.DoesNotHaveShapes);
+                    potentialWarningCells.Add(item.ExcelData.HasShapes ? CellLocation(addedRows, currColumn - 1) : null);
 
-                    worksheet.SetValue(addedRows, currColumn++, item.ExcelData.CellBackgroundColors.Any() ? "Taip" : "Ne");
-                    warningCells.Add(item.ExcelData.CellBackgroundColors.Any() ? CellLocation(addedRows, currColumn - 1) : null);
+                    worksheet.SetValue(addedRows, currColumn++, item.ExcelData.CellBackgroundColors.Any() ? ExcelReport.HasBgColors : ExcelReport.DoesNotHaveBgColors);
+                    potentialWarningCells.Add(item.ExcelData.CellBackgroundColors.Any() ? CellLocation(addedRows, currColumn - 1) : null);
 
                     //style columns before separator
                     columnSpan = currColumn - 1 - ExcelReport.ColumnOffset;
@@ -126,21 +127,21 @@ namespace DiffGenerator2.Services
                     ++currColumn;//skip one column
 
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.Maker);
-                    errorCells.Add(item.ExcelData.Maker != item.EipData.Maker ? CellLocation(addedRows, currColumn - 1) : null);
+                    potentialErrorCells.Add(item.ExcelData.Maker != item.EipData.Maker ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.Code.First());
-                    errorCells.Add(item.ExcelData.Code != item.EipData.Code.First() ? CellLocation(addedRows, currColumn - 1) : null);
+                    potentialErrorCells.Add(item.ExcelData.Code != item.EipData.Code.First() ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.Name);
-                    errorCells.Add(item.ExcelData.Name != item.EipData.Name ? CellLocation(addedRows, currColumn - 1) : null);
+                    potentialErrorCells.Add(item.ExcelData.Name != item.EipData.Name ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.Amount);
                     amountsNotEqual = item.ExcelData.AmountFirstHalf + item.ExcelData.AmountSecondHalf != item.EipData.Amount;
-                    errorCells.Add(amountsNotEqual ? CellLocation(addedRows, currColumn - 1) : null);
+                    potentialErrorCells.Add(amountsNotEqual ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.DateDateTime.ToString("yyyy-MM-dd"));
                     datesDontMatch = item.ExcelData.Date.ToString("yyyy-MM-dd") != item.EipData.DateDateTime.ToString("yyyy-MM-dd");
-                    errorCells.Add(datesDontMatch ? CellLocation(addedRows, currColumn - 1) : null);
+                    potentialErrorCells.Add(datesDontMatch ? CellLocation(addedRows, currColumn - 1) : null);
 
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.Details1);
                     worksheet.SetValue(addedRows, currColumn++, item.EipData.Details2);
@@ -149,8 +150,12 @@ namespace DiffGenerator2.Services
                     SetBorderAndBackgroundStyleForRange(worksheet.Cells[addedRows, ExcelReport.ColumnOffset, addedRows, columnSpan], addedRows % 2 != 0);
                     ++addedRows;
                 }
-                SetMismatchColoring(worksheet, errorCells.Where(cell => cell != null), ExcelReport.ErrorColoring);
-                SetMismatchColoring(worksheet, warningCells.Where(cell => cell != null), ExcelReport.WarningColoring);
+
+                var errorCells = potentialErrorCells.Where(e => e != null);
+                var warningCells = potentialWarningCells.Where(cell => cell != null);
+
+                SetMismatchColoring(worksheet, errorCells, ExcelReport.ErrorColoring);
+                SetMismatchColoring(worksheet, warningCells, ExcelReport.WarningColoring);
                 ++addedRows;
             }
             return addedRows;

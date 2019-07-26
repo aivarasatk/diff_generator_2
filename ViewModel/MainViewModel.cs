@@ -1,17 +1,12 @@
 ﻿using Autofac;
-using DiffGenerator2.Common;
 using DiffGenerator2.Constants;
 using DiffGenerator2.DTOs;
 using DiffGenerator2.Enums;
 using DiffGenerator2.Interfaces;
 using DiffGenerator2.Model;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -41,37 +36,26 @@ namespace DiffGenerator2.ViewModel
 
         private void Build()
         {
-            Model.SelectExcelFileCommand = _commandFactory.CreateCommand(async () => await SetExcelRelatedFields(FileSelect.Excel));
+            Model.SelectExcelFileCommand = _commandFactory.CreateCommand(async () => await SetExcelRelatedFieldsAsync(FileSelect.Excel));
             Model.SelectEipFileCommand = _commandFactory.CreateCommand(() => SetEipRelatedFields(FileSelect.Eip));
-            Model.ExecuteCommand = _commandFactory.CreateCommand(async () => await GenerateDiff());
+            Model.ExecuteCommand = _commandFactory.CreateCommand(async () => await GenerateDiffAsync());
         }
 
-        private async Task SetExcelRelatedFields(FileSelect excel)
+        private async Task SetExcelRelatedFieldsAsync(FileSelect excel)
         {
             Model.IsLoading = Visibility.Visible;
             try
             {
                 SetSelectedFileName(excel);
                 _logService.Information("Getting excel sheet names");
-                var excelSheetNames = await Task.Run(() =>
-                {
-                    return _lifetimeService.ExecuteInLifetime<IEnumerable<string>, IExcelReader>(
-                        reader => reader.GetAvailableSheetNames(Model.ExcelFileName)).ToList();
-                });
+                var excelSheetNames = await GetAvailableSheetNamesAsync();
             
                 Model.SheetItems.Clear();
                 _logService.Information("Creating checkboxes");
 
                 Model.SheetSelectionVisibility = FileSelected(Model.ExcelFileName) ? Visibility.Visible : Visibility.Collapsed;
 
-                foreach (var sheetName in excelSheetNames)
-                {
-                    Model.SheetItems.Add(new SheetCheckBoxItem
-                    {
-                        Name = sheetName,
-                        IsChecked = true
-                    });
-                }
+                CreateCheckBoxesForSheets(excelSheetNames);
                 Model.IsLoading = Visibility.Collapsed;
             }
             catch (Exception ex)
@@ -79,6 +63,27 @@ namespace DiffGenerator2.ViewModel
                 _logService.Error("Failed to finish displaying sheets to select. ", ex);
                 Model.IsLoading = Visibility.Collapsed;
                 MessageBox.Show($"Klaida, kuriant \"Excel\" lapų pasirinkimą:\n\"{ex.Message}\"", "Klaida", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async Task<IEnumerable<string>> GetAvailableSheetNamesAsync()
+        {
+            return await Task.Run(() =>
+            {
+                return _lifetimeService.ExecuteInLifetime<IEnumerable<string>, IExcelReader>(
+                    reader => reader.GetAvailableSheetNames(Model.ExcelFileName)).ToList();
+            });
+        }
+
+        private void CreateCheckBoxesForSheets(IEnumerable<string> excelSheetNames)
+        {
+            foreach (var sheetName in excelSheetNames)
+            {
+                Model.SheetItems.Add(new SheetCheckBoxItem
+                {
+                    Name = sheetName,
+                    IsChecked = true
+                });
             }
         }
 
@@ -124,7 +129,7 @@ namespace DiffGenerator2.ViewModel
             return _lifetimeService.ExecuteInLifetime<string, IFileSelector>(selector => selector.GetSelectedFile(filter));
         }
 
-        private async Task GenerateDiff()
+        private async Task GenerateDiffAsync()
         {
             try
             {
@@ -135,12 +140,13 @@ namespace DiffGenerator2.ViewModel
                 }
 
                 Model.IsLoading = Visibility.Visible;
+
                 _logService.Information("Started generating diff");
-                var diffReport = await GetDiffReport();
-                await GenerateExcelReport(diffReport);
+                var diffReport = await GetDiffReportAsync();
+                await GenerateExcelReportAsync(diffReport);
 
                 Model.IsLoading = Visibility.Collapsed;
-                MessageBox.Show($"Baiga kurti nesutapimų ataiskaitą", "Baigta", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Baiga kurti nesutapimų ataiskaitą. Excel failas išsaugotas \"Reports\" kataloge.", "Baigta", MessageBoxButton.OK, MessageBoxImage.Information);
                 _logService.Information("Finished generating diff");
                 _logService.Information("");
             }
@@ -152,7 +158,7 @@ namespace DiffGenerator2.ViewModel
             }
         }
 
-        private Task<DiffReport> GetDiffReport()
+        private Task<DiffReport> GetDiffReportAsync()
         {
             return Task.Run(() => {
                 var excelProductData = _lifetimeService.ExecuteInLifetime<IEnumerable<ExcelBlockData>, IExcelReader>(
@@ -169,7 +175,7 @@ namespace DiffGenerator2.ViewModel
             });
         }
 
-        private Task GenerateExcelReport(DiffReport diffReport)
+        private Task GenerateExcelReportAsync(DiffReport diffReport)
         {
             return Task.Run(() =>
             {
