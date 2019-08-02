@@ -146,7 +146,7 @@ namespace DiffGenerator2.ViewModel
                 await GenerateExcelReportAsync(diffReport);
 
                 Model.IsLoading = Visibility.Collapsed;
-                MessageBox.Show($"Baiga kurti nesutapimų ataiskaitą. Excel failas išsaugotas \"Reports\" kataloge.", "Baigta", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Baiga kurti nesutapimų ataskaitą. Excel failas išsaugotas \"Reports\" kataloge.", "Baigta", MessageBoxButton.OK, MessageBoxImage.Information);
                 _logService.Information("Finished generating diff");
                 _logService.Information("");
             }
