@@ -306,9 +306,9 @@ namespace DiffGenerator2.Services
 
                 yield return new ExcelProductData
                 {
-                    Maker = maker,
-                    Code = code,
-                    Name = name,
+                    Maker = maker.Trim(),
+                    Code = code.Trim(),
+                    Name = name.Trim(),
                     AmountFirstHalf = amountFirstHalf,
                     AmountSecondHalf = amountSecondHalf,
                     Date = SetProductDate(dateCell, amountFirstHalfCell, amountSecondHalfCell, blockDateHeader),
@@ -412,7 +412,7 @@ namespace DiffGenerator2.Services
             return amountFirstHalfValue ?? 
                    amountSecondHalfValue ??
                    dateValue ??
-                   commentsValue ?? throw new Exception($"Could not find block header. AmountFirstHalf column ID: {blockData.AmountFirstHalf}");
+                   commentsValue ?? throw new Exception($"Could not find block header for {sheet.Name}. AmountFirstHalf column ID: {blockData.AmountFirstHalf}");
         }
 
         private DateTime ParsedBlockHeader(string blockHeader)
