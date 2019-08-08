@@ -312,7 +312,7 @@ namespace DiffGenerator2.Services
                     Name = name.Trim(),
                     AmountFirstHalf = amountFirstHalf,
                     AmountSecondHalf = amountSecondHalf,
-                    Date = SetProductDate(dateCell, amountFirstHalfCell, amountSecondHalfCell, blockDateHeader),
+                    Date = SetProductDate(amountFirstHalfCell, amountSecondHalfCell, blockDateHeader),
                     Details = commentsCell.GetValue<string>(),
                     Comments = cellComments,
                     CellBackgroundColors = cellBackgroundColors,
@@ -346,26 +346,21 @@ namespace DiffGenerator2.Services
             throw new ArgumentException($"'{amountText}' is not a valid number");
         }
 
-        private DateTime SetProductDate(ExcelRange dateCell, ExcelRange amountFirstHalfCell, ExcelRange amountSecondHalfCell, DateTime headerDate)
+        private DateTime SetProductDate(ExcelRange amountFirstHalfCell, ExcelRange amountSecondHalfCell, DateTime headerDate)
         {
-            if(dateCell.Value == null)
+            if(amountFirstHalfCell.Value != null)
             {
-                if(amountFirstHalfCell.Value != null)
+                if(amountSecondHalfCell.Value != null)
                 {
-                    if(amountSecondHalfCell.Value != null)
-                    {
-                        return new DateTime(headerDate.Year, headerDate.Month, 15);
-                    }
-                    else
-                    {
-                        return new DateTime(headerDate.Year, headerDate.Month, 7);
-                    }
+                    return new DateTime(headerDate.Year, headerDate.Month, 15);
                 }
-                //if amountSecondHalf is not null 22th day is ok, if it is - 22th is still ok
-                return new DateTime(headerDate.Year, headerDate.Month, 22);
-
+                else
+                {
+                    return new DateTime(headerDate.Year, headerDate.Month, 7);
+                }
             }
-            return dateCell.GetValue<DateTime>();
+            //if amountSecondHalf is not null 22th day is ok, if it is - 22th is still ok
+            return new DateTime(headerDate.Year, headerDate.Month, 22)
         }
 
         private bool CellsHaveShapes(List<ExcelRange> dataCells, ExcelDrawings drawings)

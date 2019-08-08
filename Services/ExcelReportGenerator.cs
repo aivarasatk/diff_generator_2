@@ -82,7 +82,8 @@ namespace DiffGenerator2.Services
 
         private int GenerateMismatchPart(ExcelWorksheet worksheet, IEnumerable<Mismatch> mismatches)
         {
-            var groupedMismatchesBySheet = mismatches.OrderByDescending(m => m.SheetName).ThenBy(m => m.BlockDate).GroupBy(m => m.SheetName);
+            //must sort at least by sheet
+            var groupedMismatchesBySheet = mismatches.OrderByDescending(m => m.SheetName).ThenBy(m => m.EipData.Name).GroupBy(m => m.SheetName);
 
             var addedRows = ExcelReport.DataStartRowOffset;
             foreach(var groupedMismatch in groupedMismatchesBySheet)
@@ -241,8 +242,10 @@ namespace DiffGenerator2.Services
                 worksheet.SetValue(lastRow, currColumn++, item.AmountFirstHalf + item.AmountSecondHalf);
                 worksheet.SetValue(lastRow, currColumn++, item.Date.ToString("yyyy-MM-dd"));
                 worksheet.SetValue(lastRow, currColumn++, item.Details);
+
                 worksheet.SetValue(lastRow, currColumn++, item.HasShapes ? ExcelReport.HasShapes : ExcelReport.DoesNotHaveShapes);
                 potentialWarningCells.Add(item.HasShapes ? CellLocation(lastRow, currColumn - 1) : null);
+
                 worksheet.SetValue(lastRow, currColumn++, item.CellBackgroundColors.Any() ? ExcelReport.HasBgColors : ExcelReport.DoesNotHaveBgColors);
                 potentialWarningCells.Add(item.CellBackgroundColors.Any() ? CellLocation(lastRow, currColumn - 1) : null);
 
