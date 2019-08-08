@@ -230,6 +230,7 @@ namespace DiffGenerator2.Services
         }
         private int GenerateMissingEipProductPart(ExcelWorksheet worksheet, IEnumerable<ExcelProductData> productsMissingFromEip, int lastRow)
         {
+            var potentialWarningCells = new List<Tuple<int, int>>();
             foreach (var item in productsMissingFromEip)
             {
                 var currColumn = ExcelReport.ColumnOffset;
@@ -240,6 +241,10 @@ namespace DiffGenerator2.Services
                 worksheet.SetValue(lastRow, currColumn++, item.AmountFirstHalf + item.AmountSecondHalf);
                 worksheet.SetValue(lastRow, currColumn++, item.Date.ToString("yyyy-MM-dd"));
                 worksheet.SetValue(lastRow, currColumn++, item.Details);
+                worksheet.SetValue(lastRow, currColumn++, item.HasShapes ? ExcelReport.HasShapes : ExcelReport.DoesNotHaveShapes);
+                potentialWarningCells.Add(item.HasShapes ? CellLocation(lastRow, currColumn - 1) : null);
+                worksheet.SetValue(lastRow, currColumn++, item.CellBackgroundColors.Any() ? ExcelReport.HasBgColors : ExcelReport.DoesNotHaveBgColors);
+                potentialWarningCells.Add(item.CellBackgroundColors.Any() ? CellLocation(lastRow, currColumn - 1) : null);
 
                 var range = worksheet.Cells[lastRow,
                                             ExcelReport.ColumnOffset,
@@ -248,6 +253,7 @@ namespace DiffGenerator2.Services
                 SetBorderAndBackgroundStyleForRange(range, lastRow % 2 != 0);
                 ++lastRow;
             }
+            SetMismatchColoring(worksheet, potentialWarningCells.Where(c => c != null), ExcelReport.WarningColoring);
             return lastRow;
         }
 

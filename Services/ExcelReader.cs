@@ -286,22 +286,23 @@ namespace DiffGenerator2.Services
                 var cellBackgroundColors = GetCellBackgroundColors(dataCells);
                 var cellsHaveShapes = CellsHaveShapes(dataCells, sheet.Drawings);
 
-                if (allCellsEmpty && !cellComments.Any()
-                    && !cellBackgroundColors.Any() && !cellsHaveShapes)
+                if (allCellsEmpty && !cellComments.Any() && !cellBackgroundColors.Any())
                 {
                     continue;
                 }
 
+                var amountFirstHalfText = amountFirstHalfCell.GetValue<string>();
+                var amountSecondHalfText = amountSecondHalfCell.GetValue<string>();
                 var amountFirstHalf = 0;
                 var amountSecondHalf = 0;
                 try
                 {
-                    amountFirstHalf = amountFirstHalfCell.GetValue<int>();
-                    amountSecondHalf = amountSecondHalfCell.GetValue<int>();
+                    amountFirstHalf = GetAmountIntValue(amountFirstHalfText);
+                    amountSecondHalf = GetAmountIntValue(amountSecondHalfText);
                 }
                 catch(Exception ex)
                 {
-                    throw new FormatException($"Failed to parse amount for {sheet.Name} {blockDateHeader.ToString("yyyy-MM-dd")} {code} {name} ", ex);
+                    throw new FormatException($"Failed to parse amount for:{Environment.NewLine} {sheet.Name} {blockDateHeader.ToString("yyyy-MM-dd")} {code} {name} {ex.Message}", ex);
                 }
 
                 yield return new ExcelProductData
@@ -320,6 +321,31 @@ namespace DiffGenerator2.Services
             }
         }
 
+        private int GetAmountIntValue(string amountText)
+        {
+            if (string.IsNullOrEmpty(amountText))
+            {
+                return 0;
+            }
+            var cleanAmountText = amountText;
+            foreach (var postfix in AllowedAmountPostfixes.Values)
+            {
+                var index = amountText.IndexOf(postfix);
+                if (index != -1)
+                {
+                    cleanAmountText = amountText.Remove(index, postfix.Length);
+                    break;
+                }
+            }
+
+            if(Int32.TryParse(cleanAmountText, out var res))
+            {
+                return res;
+            }
+
+            throw new ArgumentException($"'{amountText}' is not a valid number");
+        }
+
         private DateTime SetProductDate(ExcelRange dateCell, ExcelRange amountFirstHalfCell, ExcelRange amountSecondHalfCell, DateTime headerDate)
         {
             if(dateCell.Value == null)
@@ -335,6 +361,7 @@ namespace DiffGenerator2.Services
                         return new DateTime(headerDate.Year, headerDate.Month, 7);
                     }
                 }
+                //if amountSecondHalf is not null 22th day is ok, if it is - 22th is still ok
                 return new DateTime(headerDate.Year, headerDate.Month, 22);
 
             }

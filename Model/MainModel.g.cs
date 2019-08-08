@@ -72,7 +72,7 @@ namespace DiffGenerator2.Model
             }
         }
 
-        public static string SheetItemsPropertyName = "SheetNamesPropertyName";
+        public static string SheetItemsPropertyName = "SheetItems";
 
         public ObservableCollection<SheetCheckBoxItem> SheetItems
         {
