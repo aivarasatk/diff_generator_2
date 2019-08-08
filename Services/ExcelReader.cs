@@ -360,7 +360,7 @@ namespace DiffGenerator2.Services
                 }
             }
             //if amountSecondHalf is not null 22th day is ok, if it is - 22th is still ok
-            return new DateTime(headerDate.Year, headerDate.Month, 22)
+            return new DateTime(headerDate.Year, headerDate.Month, 22);
         }
 
         private bool CellsHaveShapes(List<ExcelRange> dataCells, ExcelDrawings drawings)
