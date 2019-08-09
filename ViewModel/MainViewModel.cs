@@ -4,6 +4,8 @@ using DiffGenerator2.DTOs;
 using DiffGenerator2.Enums;
 using DiffGenerator2.Interfaces;
 using DiffGenerator2.Model;
+using DiffGenerator2.Views;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +39,7 @@ namespace DiffGenerator2.ViewModel
         private void Build()
         {
             Model.SelectExcelFileCommand = _commandFactory.CreateCommand(async () => await SetExcelRelatedFieldsAsync(FileSelect.Excel));
-            Model.SelectEipFileCommand = _commandFactory.CreateCommand(() => SetEipRelatedFields(FileSelect.Eip));
+            Model.SelectEipFileCommand = _commandFactory.CreateCommand(async () => await SetEipRelatedFields(FileSelect.Eip));
             Model.ExecuteCommand = _commandFactory.CreateCommand(async () => await GenerateDiffAsync());
         }
 
@@ -62,7 +64,7 @@ namespace DiffGenerator2.ViewModel
             {
                 _logService.Error("Failed to finish displaying sheets to select. ", ex);
                 Model.IsLoading = Visibility.Collapsed;
-                MessageBox.Show($"Klaida, kuriant \"Excel\" lapų pasirinkimą:\n\"{ex.Message}\"", "Klaida", MessageBoxButton.OK, MessageBoxImage.Error);
+                await ShowMessageDialogAsync(DialogIcon.ErrorFilled, $"Klaida, kuriant \"Excel\" lapų pasirinkimą:\n\"{ex.Message}\"");
             }
         }
 
@@ -92,7 +94,7 @@ namespace DiffGenerator2.ViewModel
             return !string.IsNullOrEmpty(fileName) && fileName != UIDefault.FileNotSelected;
         }
 
-        private void SetEipRelatedFields(FileSelect eipMode)
+        private async Task SetEipRelatedFields(FileSelect eipMode)
         {
             try
             {
@@ -101,7 +103,8 @@ namespace DiffGenerator2.ViewModel
             catch(Exception ex)
             {
                 _logService.Error($"Failed to select eip file", ex);
-                MessageBox.Show($"Klaida, pasirenkant .eip failą:\n\"{ex.Message}\"", "Klaida", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                await ShowMessageDialogAsync(DialogIcon.ErrorFilled, $"Klaida, pasirenkant .eip failą:\n\"{ex.Message}\"");
             }
         }
 
@@ -135,7 +138,7 @@ namespace DiffGenerator2.ViewModel
             {
                 if (Model.SheetItems.All(sheet => !sheet.IsChecked))
                 {
-                    MessageBox.Show("Nėra pasirinktų „Excel“ lapų", "Klaida", MessageBoxButton.OK, MessageBoxImage.Information);
+                    await ShowMessageDialogAsync(DialogIcon.InformationFilled, "Nėra pasirinktų „Excel“ lapų");
                     return;
                 }
 
@@ -146,7 +149,9 @@ namespace DiffGenerator2.ViewModel
                 await GenerateExcelReportAsync(diffReport);
 
                 Model.IsLoading = Visibility.Collapsed;
-                MessageBox.Show($"Baiga kurti nesutapimų ataskaitą. Excel failas išsaugotas \"Reports\" kataloge.", "Baigta", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                await ShowMessageDialogAsync(DialogIcon.InformationFilled, $"Baigta kurti nesutapimų ataskaita. Excel failas išsaugotas \"Reports\" kataloge.");
+
                 _logService.Information("Finished generating diff");
                 _logService.Information("");
             }
@@ -154,7 +159,7 @@ namespace DiffGenerator2.ViewModel
             {
                 Model.IsLoading = Visibility.Collapsed;
                 _logService.Error("Generate Diff error. ", ex);
-                MessageBox.Show($"Klaida generuojant nesutapimų ataskaitą:\n\"{ex.Message}\"", "Klaida", MessageBoxButton.OK, MessageBoxImage.Warning);
+                await ShowMessageDialogAsync(DialogIcon.WarningFilled, $"Klaida generuojant nesutapimų ataskaitą:\n\"{ex.Message}\"");
             }
         }
 
@@ -182,6 +187,19 @@ namespace DiffGenerator2.ViewModel
                 _logService.Information("Start generating excel report");
                 _lifetimeService.ExecuteInLifetime<IExcelReportGenerator>(generator => generator.GenerateReport(diffReport));
             });
+        }
+
+        private async Task ShowMessageDialogAsync(string icon, string message)
+        {
+            var view = new InformationDialogView
+            {
+                DataContext = new InformationDialogModel
+                {
+                    Icon = icon,
+                    Message = message
+                }
+            };
+            await DialogHost.Show(view, "RootDialog");
         }
 
         private void InitComponents()

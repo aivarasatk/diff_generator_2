@@ -25,12 +25,7 @@ namespace DiffGenerator2.Model
             }
             set
             {
-                if (_excelFileName == value)
-                    return;
-
-                _excelFileName = value;
-
-                OnPropertyChanged(ExcelFileNamePropertyName);
+                this.MutateVerbose(ref _excelFileName, value, RaisePropertyChanged());
             }
         }
 
@@ -44,12 +39,7 @@ namespace DiffGenerator2.Model
             }
             set
             {
-                if (_eipFileName == value)
-                    return;
-
-                _eipFileName = value;
-
-                OnPropertyChanged(EipFileNamePropertyName);
+                this.MutateVerbose(ref _eipFileName, value, RaisePropertyChanged());
             }
         }
 
@@ -63,16 +53,11 @@ namespace DiffGenerator2.Model
             }
             set
             {
-                if (_executeEnabled == value)
-                    return;
-
-                _executeEnabled = value;
-
-                OnPropertyChanged(ExecuteEnabledPropertyName);
+                this.MutateVerbose(ref _executeEnabled, value, RaisePropertyChanged());
             }
         }
 
-        public static string SheetItemsPropertyName = "SheetNamesPropertyName";
+        public static string SheetItemsPropertyName = "SheetItems";
 
         public ObservableCollection<SheetCheckBoxItem> SheetItems
         {
@@ -82,12 +67,7 @@ namespace DiffGenerator2.Model
             }
             set
             {
-                if (_sheetItems == value)
-                    return;
-
-                _sheetItems = value;
-
-                OnPropertyChanged(SheetItemsPropertyName);
+                this.MutateVerbose(ref _sheetItems, value, RaisePropertyChanged());
             }
         }
 
@@ -101,12 +81,7 @@ namespace DiffGenerator2.Model
             }
             set
             {
-                if (_isLoading == value)
-                    return;
-
-                _isLoading = value;
-
-                OnPropertyChanged(IsLoadingPropertyName);
+                this.MutateVerbose(ref _isLoading, value, RaisePropertyChanged());
             }
         }
 
@@ -119,14 +94,10 @@ namespace DiffGenerator2.Model
             }
             set
             {
-                if (_sheetSelectionVisibility == value)
-                    return;
-
-                _sheetSelectionVisibility = value;
-                OnPropertyChanged(SheetSelectionVisibilityPropertyName);
+                this.MutateVerbose(ref _sheetSelectionVisibility, value, RaisePropertyChanged());
             }
         }
-        #region IDataErrorInfo Members
+
         public static string ErrorPropertyName = "Error";
 
         public string Error {
@@ -134,11 +105,7 @@ namespace DiffGenerator2.Model
 
             set
             {
-                if (_error == value)
-                    return;
-
-                _error = value;
-                OnPropertyChanged(ErrorPropertyName);
+                this.MutateVerbose(ref _error, value, RaisePropertyChanged());
             }
         }
 
@@ -185,14 +152,12 @@ namespace DiffGenerator2.Model
         {
             return !string.IsNullOrEmpty(fileName) && fileName != UIDefault.FileNotSelected;
         }
-        #endregion
 
-        #region INotificationChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged([CallerMemberName]string propertyName = null)
+
+        private Action<PropertyChangedEventArgs> RaisePropertyChanged()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            return args => PropertyChanged?.Invoke(this, args);
         }
-        #endregion
     }
 }

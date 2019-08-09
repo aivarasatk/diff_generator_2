@@ -4,130 +4,129 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="15"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
         mc:Ignorable="d"
-        Title="DiffChecker2" Height="200" Width="450"
+        Title="DiffChecker2" MinHeight="250" Width="620"
         SizeToContent="Height">
     <Window.Resources>
-        <Style x:Key="errorMessageStyle" TargetType="{x:Type TextBlock}">
-            <Setter Property="Foreground" Value="Red"/>
-        </Style>
-        <Style x:Key="errorStyle"
-               TargetType="TextBlock">
-            <Setter Property="Validation.ErrorTemplate">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <DockPanel LastChildFill="True">
-                            <Border BorderBrush="Red" BorderThickness="2">
-                                <AdornedElementPlaceholder Name="controlWithError"/>
-                            </Border>
-                        </DockPanel>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.DialogHost.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
-
-    <Grid>
-        <AdornerDecorator>
-            <Grid Margin="10,10,10,10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                </Grid.RowDefinitions>
-
-                <Grid Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,10">
+    <materialDesign:DialogHost Identifier="RootDialog">
+        <Grid>
+            <AdornerDecorator>
+                <Grid Margin="16">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150" />
-                        <ColumnDefinition Width="3*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Pasirinkite Excel failą:"/>
-
-                    <TextBlock Style="{StaticResource errorStyle}" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontStyle="Italic" Margin="10,0,10,0" Padding="3px,0px,0px,0px"
-                        TextTrimming="CharacterEllipsis" Text="{Binding Path=Model.ExcelFileName, ValidatesOnDataErrors=True}"/>
-                    <Button Grid.Column="2" Content="Pasirinkti" Width="Auto" Command="{Binding Path=Model.SelectExcelFileCommand}"/>
-                </Grid>
-
-                <Grid Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,10" Visibility= "{Binding Model.SheetSelectionVisibility}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left"
+                    <Grid Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,32">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="190" />
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Pasirinkite Excel failą:"/>
+
+                        <TextBox  Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontStyle="Italic" Margin="16,0,16,0"
+                              Text="{Binding Path=Model.ExcelFileName, ValidatesOnDataErrors=True}"
+                              materialDesign:ValidationAssist.FontSize="13" IsReadOnly="True"/>
+
+                        <Button Style="{StaticResource MaterialDesignRaisedButton}" Grid.Column="2" Content="Pasirinkti" Width="Auto"  Margin="32,0,0,0"
+                            Command="{Binding Path=Model.SelectExcelFileCommand}"/>
+                    </Grid>
+
+                    <Grid Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,32" Visibility="{Binding Model.SheetSelectionVisibility}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="190" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left"
                        Text="Pažymėkite lapus tikrinimui:"/>
 
-                    <ItemsControl Grid.Column="1" ItemsSource="{Binding Model.SheetItems}" Margin="10,0,0,0" >
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
+                        <ItemsControl Grid.Column="1" ItemsSource="{Binding Model.SheetItems}" Margin="16,0,0,0" >
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
 
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsChecked}" Margin="0,0,10,0">
-                                    <TextBlock Text="{Binding Name}"/>
-                                </CheckBox>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsChecked}" Margin="0,0,16,0">
+                                        <TextBlock Text="{Binding Name}"/>
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+
+                    <Grid Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,32">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="190" />
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Pasirinkite Eip failą:" />
+
+
+                        <TextBox  Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontStyle="Italic"  Margin="16,0,16,0" 
+                              Text="{Binding Path=Model.EipFileName, ValidatesOnDataErrors=True}"
+                              materialDesign:ValidationAssist.FontSize="13" IsReadOnly="True">
+                        </TextBox>
+
+                        <Button Style="{StaticResource MaterialDesignRaisedButton}" Grid.Column="2" Content="Pasirinkti" Margin="32,0,0,0"
+                            Command="{Binding Path=Model.SelectEipFileCommand}"/>
+                    </Grid>
+
+                    <Grid Grid.Row="3" Margin="0,16,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0"/>
+                        <Button  Style="{StaticResource MaterialDesignRaisedButton}" Grid.Column="1" Content="Vykdyti" 
+                             Command="{Binding Path=Model.ExecuteCommand}"  IsEnabled="{Binding Path=Model.ExecuteEnabled}"/>
+                        <TextBlock Grid.Column="0"/>
+                    </Grid>
                 </Grid>
-
-                <Grid Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150" />
-                        <ColumnDefinition Width="3*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Pasirinkite Eip failą:" />
-
-
-                    <TextBlock Style="{StaticResource errorStyle}" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontStyle="Italic"  Margin="10,0,10,0" Padding="3,0,0,0"
-                       TextTrimming="CharacterEllipsis" Text="{Binding Path=Model.EipFileName, ValidatesOnDataErrors=True}"/>
-                   
-                    <Button Grid.Column="2" Content="Pasirinkti" Command="{Binding Path=Model.SelectEipFileCommand}"/>
-                </Grid>
-
-                <Grid Grid.Row="3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Grid.Column="0"/>
-                    <Button  Grid.Column="1" Content="Vykdyti" Command="{Binding Path=Model.ExecuteCommand}"
-                        IsEnabled="{Binding Path=Model.ExecuteEnabled}"/>
-                    <TextBlock Grid.Column="0"/>
-                </Grid>
-
-                <Grid Grid.Row="4" Margin="5,10,0,0">
-                    <TextBlock Style="{StaticResource errorMessageStyle}"  Text="{Binding Model.Error}" FontWeight="Bold"/>
-                </Grid>
+            </AdornerDecorator>
+            <Grid Visibility="{Binding Model.IsLoading}">
+                <StackPanel Background="LightGray" Opacity="0.5"/>
+                <fa:ImageAwesome Icon="Spinner" Spin="True" SpinDuration="2" Width="40" Height="40" Visibility="Visible" Margin="16,16,16,16"/>
             </Grid>
-        </AdornerDecorator>
-        <Grid Visibility="{Binding Model.IsLoading}">
-            <StackPanel Background="LightGray" Opacity="0.5"/>
-            <fa:ImageAwesome Icon="Spinner" Spin="True" SpinDuration="2" Width="40" Height="40" Visibility="Visible" Margin="5,5,5,5"/>
         </Grid>
-    </Grid>
-
+    </materialDesign:DialogHost>
+    
 </Window>
