@@ -105,6 +105,7 @@
     <Compile Include="Common\Command.cs" />
     <Compile Include="Common\ContainerConfig.cs" />
     <Compile Include="Constants\AllowedAmountPostfix.cs" />
+    <Compile Include="Constants\DialogIcon.cs" />
     <Compile Include="Constants\ExcelDataBlockColumnNaming.cs" />
     <Compile Include="Constants\ExcelReport.cs" />
     <Compile Include="Constants\ExcludedColors.cs" />
@@ -128,10 +129,12 @@
     <Compile Include="Interfaces\IFileSelector.cs" />
     <Compile Include="Interfaces\ILifetimeService.cs" />
     <Compile Include="Interfaces\ILogService.cs" />
+    <Compile Include="Model\InformationDialogModel.cs" />
     <Compile Include="Model\MainModel.cs" />
     <Compile Include="Model\MainModel.g.cs" />
     <Compile Include="Common\CommandFactory.cs" />
     <Compile Include="DTOs\SheetCheckBoxItem.cs" />
+    <Compile Include="Model\NotifyPropertyChangedExtension.cs" />
     <Compile Include="Services\DiffGenerator.cs" />
     <Compile Include="Services\EipReader.cs" />
     <Compile Include="Services\ExcelReader.cs" />
@@ -141,6 +144,9 @@
     <Compile Include="Services\LogService.cs" />
     <Compile Include="Services\LoggerBuilder.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="Views\InformationDialogView.xaml.cs">
+      <DependentUpon>InformationDialogView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -173,6 +179,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\InformationDialogView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
