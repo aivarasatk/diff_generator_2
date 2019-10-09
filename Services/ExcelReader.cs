@@ -156,7 +156,7 @@ namespace DiffGenerator2.Services
             var blockStartColumn = GetBlockStartColumn(workbook, navigationRowId);
 
             var blockDataColumns = new BlockDataColumns();
-            for (int i = blockStartColumn; i < workbook.Dimension.Columns; ++i)
+            for (int i = blockStartColumn; i <= workbook.Dimension.Columns; ++i)
             {
                 var value = workbook.GetValue<string>(navigationRowId, i);
                 if(value == null)
@@ -177,7 +177,8 @@ namespace DiffGenerator2.Services
                     {
                         yield break;
                     }
-                    throw new Exception($"Malformed row that identifies which blocks to read for {workbook.Name}");
+                    throw new Exception($"Malformed row that identifies which blocks to read for {workbook.Name}." +
+                                        $" Found END token before all header columns had their column identifiers");
                 }
 
                 if (value == ExcelDataBlockColumnNaming.AmountFirstHalf)
@@ -197,7 +198,7 @@ namespace DiffGenerator2.Services
                     blockDataColumns.Comments = i;
                 }
             }
-            throw new Exception($"Malformed row that identifies which blocks to read for {workbook.Name}");
+            throw new Exception($"Malformed row that identifies which blocks to read for {workbook.Name} - did not find END token");
         }
 
         private bool AllBlockDataColumnsSet(BlockDataColumns blockDataColumns)
