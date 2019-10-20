@@ -112,6 +112,9 @@
     <Compile Include="Constants\NamingSchemeSplitter.cs" />
     <Compile Include="Constants\SheetNavigationIdentifiers.cs" />
     <Compile Include="Constants\UIDefault.cs" />
+    <Compile Include="Controls\SheetSelectionControl.xaml.cs">
+      <DependentUpon>SheetSelectionControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DTOs\BlockDataColumns.cs" />
     <Compile Include="DTOs\DiffReport.cs" />
     <Compile Include="DTOs\ExcelBlockData.cs" />
@@ -179,6 +182,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Controls\SheetSelectionControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\InformationDialogView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

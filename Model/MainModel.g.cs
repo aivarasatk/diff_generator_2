@@ -58,7 +58,6 @@ namespace DiffGenerator2.Model
         }
 
         public static string SheetItemsPropertyName = "SheetItems";
-
         public ObservableCollection<SheetCheckBoxItem> SheetItems
         {
             get
@@ -68,6 +67,19 @@ namespace DiffGenerator2.Model
             set
             {
                 this.MutateVerbose(ref _sheetItems, value, RaisePropertyChanged());
+            }
+        }
+
+        public static string MonthOnlySheetsPropertyName = "MonthOnlySheets";
+        public ObservableCollection<SheetCheckBoxItem> MonthOnlySheets
+        {
+            get
+            {
+                return _monthOnlySheets;
+            }
+            set
+            {
+                this.MutateVerbose(ref _monthOnlySheets, value, RaisePropertyChanged());
             }
         }
 

@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:controls="clr-namespace:DiffGenerator2.Controls"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="15"
@@ -57,34 +58,31 @@
                             Command="{Binding Path=Model.SelectExcelFileCommand}"/>
                     </Grid>
 
-                    <Grid Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,32" Visibility="{Binding Model.SheetSelectionVisibility}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="190" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
+                    <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,32" Visibility="{Binding Model.SheetSelectionVisibility}">
+                        <GroupBox Header="Excel lapų konfigūracija" BorderThickness="3">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left"
-                       Text="Pažymėkite lapus tikrinimui:"/>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
 
-                        <ItemsControl Grid.Column="1" ItemsSource="{Binding Model.SheetItems}" Margin="16,0,0,0" >
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
+                                <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Pažymėkite lapus tikrinimui:" Margin="0,0,16,32"/>
+                                <controls:SheetSelectionControl Grid.Row="0" Grid.Column="1" DataContext="{Binding Model.SheetItems}" Margin="0,0,0,32" />
 
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsChecked}" Margin="0,0,16,0">
-                                        <TextBlock Text="{Binding Name}"/>
-                                    </CheckBox>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Grid>
+                                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" ToolTip="Tikrinimui bus naudojama produkto metai ir menesis, o ne pilna data" >
+                                    <materialDesign:PackIcon Kind="QuestionMarkCircle" Margin="0,0,8,0"/>
+                                    <TextBlock  Text="Specialūs lapai:" />
+                                </StackPanel>
+                                
+                                <controls:SheetSelectionControl Grid.Row="1" Grid.Column="01" DataContext="{Binding Model.MonthOnlySheets}"/>
+                            </Grid>
+                        </GroupBox>
+                    </StackPanel>
 
                     <Grid Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,32">
                         <Grid.ColumnDefinitions>

@@ -18,6 +18,7 @@ namespace DiffGenerator2.Model
         private Visibility _isLoading;
         private Visibility _sheetSelectionVisibility;
         private ObservableCollection<SheetCheckBoxItem> _sheetItems;
+        private ObservableCollection<SheetCheckBoxItem> _monthOnlySheets;
 
         private string _error;
         private List<string> _errors = new List<string>();
@@ -29,6 +30,7 @@ namespace DiffGenerator2.Model
         public MainModel()
         {
             _sheetItems = new ObservableCollection<SheetCheckBoxItem>();
+            _monthOnlySheets = new ObservableCollection<SheetCheckBoxItem>();
         }
 
     }
