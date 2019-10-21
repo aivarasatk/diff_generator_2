@@ -49,15 +49,15 @@ namespace DiffGenerator2.ViewModel
             try
             {
                 SetSelectedFileName(excel);
-                _logService.Information("Getting excel sheet names");
-                var excelSheetNames = await GetAvailableSheetNamesAsync();
-            
+
                 Model.SheetItems.Clear();
-                _logService.Information("Creating checkboxes");
+                Model.MonthOnlySheets.Clear();
 
-                Model.SheetSelectionVisibility = FileSelected(Model.ExcelFileName) ? Visibility.Visible : Visibility.Collapsed;
+                if (FileSelected(Model.ExcelFileName))
+                    await ShowAvailableSheetsAsync();
+                else
+                    Model.SheetSelectionVisibility = Visibility.Collapsed;
 
-                CreateCheckBoxesForSheets(excelSheetNames);
                 Model.IsLoading = Visibility.Collapsed;
             }
             catch (Exception ex)
@@ -66,6 +66,16 @@ namespace DiffGenerator2.ViewModel
                 Model.IsLoading = Visibility.Collapsed;
                 await ShowMessageDialogAsync(DialogIcon.ErrorFilled, $"Klaida, kuriant \"Excel\" lapų pasirinkimą:\n\"{ex.Message}\"");
             }
+        }
+
+        private async Task ShowAvailableSheetsAsync()
+        {
+            _logService.Information("Getting excel sheet names");
+            var excelSheetNames = await GetAvailableSheetNamesAsync();
+
+            _logService.Information("Creating checkboxes");
+            CreateCheckBoxesForSheets(excelSheetNames);
+            Model.SheetSelectionVisibility = Visibility.Visible;
         }
 
         private async Task<IEnumerable<string>> GetAvailableSheetNamesAsync()
@@ -85,6 +95,12 @@ namespace DiffGenerator2.ViewModel
                 {
                     Name = sheetName,
                     IsChecked = true
+                });
+
+                Model.MonthOnlySheets.Add(new SheetCheckBoxItem
+                {
+                    Name = sheetName,
+                    IsChecked = false
                 });
             }
         }
@@ -176,7 +192,8 @@ namespace DiffGenerator2.ViewModel
                     });
 
                 return _lifetimeService.ExecuteInLifetime<DiffReport, IDiffGenerator>(
-                    reader => reader.GenerateDiffReport(eipData.ToList(), excelProductData.ToList()));
+                    reader => reader.GenerateDiffReport(eipData.ToList(), excelProductData.ToList(), 
+                                                        Model.MonthOnlySheets.Where(s => s.IsChecked).ToList()));
             });
         }
 
