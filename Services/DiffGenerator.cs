@@ -18,7 +18,7 @@ namespace DiffGenerator2.Services
             _logService = logService ?? throw new ArgumentNullException(nameof(logService));
         }
 
-        public DiffReport GenerateDiffReport(IList<I07> eipData, IList<ExcelBlockData> excelData)
+        public DiffReport GenerateDiffReport(IList<I07> eipData, IList<ExcelBlockData> excelData, IList<SheetCheckBoxItem> checkMonthOnlySheets)
         {
             _logService.Information("Generating diff report");
 
@@ -27,7 +27,7 @@ namespace DiffGenerator2.Services
             var existingEipProductsInExcel = new List<I07>();
             foreach (var excelBlock in excelData)
             {
-                
+                var toCheckMonthOnly = checkMonthOnlySheets.Any(sheet => sheet.Name == excelBlock.SheetName);
                 foreach(var excelProduct in excelBlock.ProductData)
                 {
                     var eipProduct = eipData.FirstOrDefault(data => data.Code.First() == excelProduct.Code 
@@ -44,7 +44,7 @@ namespace DiffGenerator2.Services
                     }
 
                     existingEipProductsInExcel.Add(eipProduct);
-                    if(HasMismatch(excelProduct, eipProduct))
+                    if(HasMismatch(excelProduct, eipProduct, toCheckMonthOnly))
                     {
                         mismatches.Add(new Mismatch
                         {
@@ -72,12 +72,14 @@ namespace DiffGenerator2.Services
             return eipProduct == null && cellBackgroundColors.Any(c => ExcludedColors.MarkedInExcelAsDone.Contains(c));
         }
 
-        private bool HasMismatch(ExcelProductData excelProduct, I07 eipProduct)
+        private bool HasMismatch(ExcelProductData excelProduct, I07 eipProduct, bool checkMonthOnly)
         {
-            return excelProduct.AmountFirstHalf + excelProduct.AmountSecondHalf != eipProduct.Amount
-            || excelProduct.Maker != eipProduct.Maker
-            || excelProduct.Name != eipProduct.Name
-            || excelProduct.Date.Day != eipProduct.DateDateTime.Day;
+            var isMismatchWithoutDay = excelProduct.AmountFirstHalf + excelProduct.AmountSecondHalf != eipProduct.Amount
+                                        || excelProduct.Maker != eipProduct.Maker
+                                        || excelProduct.Name != eipProduct.Name;
+            var isMismatchWithDay = isMismatchWithoutDay || excelProduct.Date.Day != eipProduct.DateDateTime.Day;
+
+            return checkMonthOnly ?  isMismatchWithoutDay : isMismatchWithDay;
         }
     }
 }

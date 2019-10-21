@@ -9,6 +9,6 @@ namespace DiffGenerator2.Interfaces
 {
     public interface IDiffGenerator
     {
-        DiffReport GenerateDiffReport(IList<I07> eipData, IList<ExcelBlockData> excelData);
+        DiffReport GenerateDiffReport(IList<I07> eipData, IList<ExcelBlockData> excelData, IList<SheetCheckBoxItem> checkMonthOnlySheets);
     }
 }

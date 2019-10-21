@@ -192,7 +192,8 @@ namespace DiffGenerator2.ViewModel
                     });
 
                 return _lifetimeService.ExecuteInLifetime<DiffReport, IDiffGenerator>(
-                    reader => reader.GenerateDiffReport(eipData.ToList(), excelProductData.ToList()));
+                    reader => reader.GenerateDiffReport(eipData.ToList(), excelProductData.ToList(), 
+                                                        Model.MonthOnlySheets.Where(s => s.IsChecked).ToList()));
             });
         }
 

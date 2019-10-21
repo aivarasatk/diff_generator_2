@@ -19,12 +19,12 @@ namespace Tests
             var logService = new Mock<ILogService>();
             var eipProduct = new List<I07>
             {
-                EipProductCodeA()
+                EipProductCodeAMakerA()
             };
 
             var excelProduct = new List<ExcelProductData>
             {
-                ExcelProductCodeA()
+                ExcelProductCodeAMakerA()
             };
 
             var excelBlockData = new List<ExcelBlockData>
@@ -39,8 +39,9 @@ namespace Tests
 
             var generator = new DiffGenerator(logService.Object);
 
+            var onlyMonthCheckSheets = new List<SheetCheckBoxItem>();
             //assess
-            var result = generator.GenerateDiffReport(eipProduct, excelBlockData);
+            var result = generator.GenerateDiffReport(eipProduct, excelBlockData, onlyMonthCheckSheets);
 
             Assert.IsTrue(!result.Mismatches.Any());
         }
@@ -52,7 +53,7 @@ namespace Tests
             var logService = new Mock<ILogService>();
             var eipProduct = new List<I07>
             {
-                EipProductCodeA()
+                EipProductCodeAMakerA()
             };
 
             var excelProduct = new List<ExcelProductData>
@@ -71,9 +72,9 @@ namespace Tests
             };
 
             var generator = new DiffGenerator(logService.Object);
-
+            var onlyMonthCheckSheets = new List<SheetCheckBoxItem>();
             //assess
-            var result = generator.GenerateDiffReport(eipProduct, excelBlockData);
+            var result = generator.GenerateDiffReport(eipProduct, excelBlockData, onlyMonthCheckSheets);
             var mismatches = result.Mismatches.ToList();
 
             Assert.IsTrue(mismatches.Count == 1 
@@ -87,13 +88,13 @@ namespace Tests
             var logService = new Mock<ILogService>();
             var eipProduct = new List<I07>
             {
-                EipProductCodeA()
+                EipProductCodeAMakerA()
             };
 
             var excelProduct = new List<ExcelProductData>
             {
-                ExcelProductCodeA(),
-                ExcelProductCodeB()
+                ExcelProductCodeAMakerA(),
+                ExcelProductCodeBMakerB()
 
             };
 
@@ -108,9 +109,9 @@ namespace Tests
             };
 
             var generator = new DiffGenerator(logService.Object);
-
+            var onlyMonthCheckSheets = new List<SheetCheckBoxItem>();
             //assess
-            var result = generator.GenerateDiffReport(eipProduct, excelBlockData);
+            var result = generator.GenerateDiffReport(eipProduct, excelBlockData, onlyMonthCheckSheets);
             var missing = result.ProductsMissingFromEip.ToList();
 
             Assert.IsTrue(!result.Mismatches.Any()
@@ -125,13 +126,13 @@ namespace Tests
             var logService = new Mock<ILogService>();
             var eipProduct = new List<I07>
             {
-                EipProductCodeA(),
-                EipProductCodeB()
+                EipProductCodeAMakerA(),
+                EipProductCodeBMakerA()
             };
 
             var excelProduct = new List<ExcelProductData>
             {
-                ExcelProductCodeA()
+                ExcelProductCodeAMakerA()
             };
 
             var excelBlockData = new List<ExcelBlockData>
@@ -145,9 +146,9 @@ namespace Tests
             };
 
             var generator = new DiffGenerator(logService.Object);
-
+            var onlyMonthCheckSheets = new List<SheetCheckBoxItem>();
             //assess
-            var result = generator.GenerateDiffReport(eipProduct, excelBlockData);
+            var result = generator.GenerateDiffReport(eipProduct, excelBlockData, onlyMonthCheckSheets);
             var missing = result.ProductsMissingFromExcel.ToList();
 
             Assert.IsTrue(!result.Mismatches.Any()
@@ -162,8 +163,8 @@ namespace Tests
             var logService = new Mock<ILogService>();
             var eipProduct = new List<I07>
             {
-                EipProductCodeA(),
-                EipProductCodeB()
+                EipProductCodeAMakerA(),
+                EipProductCodeBMakerA()
             };
 
             var excelProduct = new List<ExcelProductData>
@@ -182,9 +183,9 @@ namespace Tests
             };
 
             var generator = new DiffGenerator(logService.Object);
-
+            var onlyMonthCheckSheets = new List<SheetCheckBoxItem>();
             //assess
-            var result = generator.GenerateDiffReport(eipProduct, excelBlockData);
+            var result = generator.GenerateDiffReport(eipProduct, excelBlockData, onlyMonthCheckSheets);
             var missing = result.ProductsMissingFromExcel.ToList();
             var mismatches = result.Mismatches.ToList();
 
@@ -201,13 +202,13 @@ namespace Tests
             var logService = new Mock<ILogService>();
             var eipProduct = new List<I07>
             {
-                EipProductCodeA()
+                EipProductCodeAMakerA()
             };
 
             var excelProduct = new List<ExcelProductData>
             {
                 ExcelProductCodeAMakerB(),
-                ExcelProductCodeB()
+                ExcelProductCodeBMakerB()
             };
 
             var excelBlockData = new List<ExcelBlockData>
@@ -221,9 +222,9 @@ namespace Tests
             };
 
             var generator = new DiffGenerator(logService.Object);
-
+            var onlyMonthCheckSheets = new List<SheetCheckBoxItem>();
             //assess
-            var result = generator.GenerateDiffReport(eipProduct, excelBlockData);
+            var result = generator.GenerateDiffReport(eipProduct, excelBlockData, onlyMonthCheckSheets);
             var missing = result.ProductsMissingFromEip.ToList();
             var mismatches = result.Mismatches.ToList();
 
@@ -240,14 +241,14 @@ namespace Tests
             var logService = new Mock<ILogService>();
             var eipProduct = new List<I07>
             {
-                EipProductCodeA(),
-                EipProductCodeC()
+                EipProductCodeAMakerA(),
+                EipProductCodeCMakerA()
             };
 
             var excelProduct = new List<ExcelProductData>
             {
                 ExcelProductCodeAMakerB(),
-                ExcelProductCodeB()
+                ExcelProductCodeBMakerB()
             };
 
             var excelBlockData = new List<ExcelBlockData>
@@ -261,9 +262,9 @@ namespace Tests
             };
 
             var generator = new DiffGenerator(logService.Object);
-
+            var onlyMonthCheckSheets = new List<SheetCheckBoxItem>();
             //assess
-            var result = generator.GenerateDiffReport(eipProduct, excelBlockData);
+            var result = generator.GenerateDiffReport(eipProduct, excelBlockData, onlyMonthCheckSheets);
             var eipMissing = result.ProductsMissingFromEip.ToList();
             var excelMissing = result.ProductsMissingFromExcel.ToList();
             var mismatches = result.Mismatches.ToList();
@@ -276,7 +277,82 @@ namespace Tests
                 && mismatches[0].ExcelData.Maker != mismatches[0].EipData.Maker);
         }
 
-        private ExcelProductData ExcelProductCodeA()
+        [TestMethod]
+        public void When_special_sheets_are_selected_day_mismatch_is_not_counted()
+        {
+            //arrange
+            var logService = new Mock<ILogService>();
+            var eipProduct = new List<I07>
+            {
+                EipProductCodeAMakerA()
+            };
+
+            var product = ExcelProductCodeAMakerA();
+            product.Date = product.Date.AddDays(5);
+            var excelProduct = new List<ExcelProductData>
+            {
+                product
+            };
+
+            var excelBlockData = new List<ExcelBlockData>
+            {
+                new ExcelBlockData
+                {
+                    Date = new DateTime(2019, 7, 7),
+                    ProductData = excelProduct,
+                    SheetName = "sheet"
+                }
+            };
+
+            var generator = new DiffGenerator(logService.Object);
+            var onlyMonthCheckSheets = new List<SheetCheckBoxItem> 
+            { 
+                new SheetCheckBoxItem { IsChecked = true, Name = "sheet" }
+            };
+            //assess
+            var result = generator.GenerateDiffReport(eipProduct, excelBlockData, onlyMonthCheckSheets);
+            var mismatches = result.Mismatches.ToList();
+
+            Assert.IsTrue(mismatches.Count == 0);
+        }
+
+        [TestMethod]
+        public void When_special_sheets_are_not_selected_day_mismatch_is_counted()
+        {
+            //arrange
+            var logService = new Mock<ILogService>();
+            var eipProduct = new List<I07>
+            {
+                EipProductCodeAMakerA()
+            };
+
+            var product = ExcelProductCodeAMakerA();
+            product.Date = product.Date.AddDays(5);
+            var excelProduct = new List<ExcelProductData>
+            {
+                product
+            };
+
+            var excelBlockData = new List<ExcelBlockData>
+            {
+                new ExcelBlockData
+                {
+                    Date = new DateTime(2019, 7, 7),
+                    ProductData = excelProduct,
+                    SheetName = "sheet"
+                }
+            };
+
+            var generator = new DiffGenerator(logService.Object);
+            var onlyMonthCheckSheets = new List<SheetCheckBoxItem>();
+            //assess
+            var result = generator.GenerateDiffReport(eipProduct, excelBlockData, onlyMonthCheckSheets);
+            var mismatches = result.Mismatches.ToList();
+
+            Assert.IsTrue(mismatches.Count == 1);
+        }
+
+        private ExcelProductData ExcelProductCodeAMakerA()
         {
             return new ExcelProductData
             {
@@ -310,7 +386,7 @@ namespace Tests
             };
         }
 
-        private ExcelProductData ExcelProductCodeB()
+        private ExcelProductData ExcelProductCodeBMakerB()
         {
             return new ExcelProductData
             {
@@ -327,7 +403,7 @@ namespace Tests
             };
         }
 
-        private I07 EipProductCodeA()
+        private I07 EipProductCodeAMakerA()
         {
             return new I07
             {
@@ -341,7 +417,7 @@ namespace Tests
             };
         }
 
-        private I07 EipProductCodeB()
+        private I07 EipProductCodeBMakerA()
         {
             return new I07
             {
@@ -354,7 +430,7 @@ namespace Tests
                 Details2 = "A",
             };
         }
-        private I07 EipProductCodeC()
+        private I07 EipProductCodeCMakerA()
         {
             return new I07
             {
