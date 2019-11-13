@@ -55,6 +55,7 @@ namespace DiffGenerator2.Constants
 
         public const string ProductsMissingFromExcel = "Užsakymai, kurių nėra GP plane(Excel)";
         public const string ProductsMissingFromEip = "Užsakymai, kurių nėra GEN plane (Rivilėje)";
+        public const string ProductsOutOfRange = "GEN plano užsakymai nepatenkantys į tikrinimo intervalą";
 
         public const string HasShapes = "Taip";
         public const string DoesNotHaveShapes = "Ne";
