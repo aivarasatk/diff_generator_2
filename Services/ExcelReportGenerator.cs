@@ -17,7 +17,7 @@ namespace DiffGenerator2.Services
     {
         public void GenerateReport(DiffReport diffReport)
         {
-            var path = $"{Directory.GetCurrentDirectory()}\\Reports\\report_{DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss")}.xlsx";
+            var path = Path.Combine($"{Directory.GetCurrentDirectory()}\\Reports", $"report_{DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss")}.xlsx");
             var fileInfo = new FileInfo(path);
             fileInfo.Directory.Create();//creating a dir if does not exist
 
@@ -30,17 +30,20 @@ namespace DiffGenerator2.Services
                 SetFilterForTable(worksheet, lastRow - 1);//filtering only mismatches
 
                 SetSeparator(worksheet.Cells[lastRow, ExcelReport.ColumnOffset, lastRow, ExcelReport.DataEndColumn -1]);
-                SetMissingFromEipHeader(worksheet, ++lastRow);
+                SetMissingFromEipHeader(worksheet, ++lastRow, diffReport.CheckedRange);
                 lastRow = GenerateMissingEipProductPart(worksheet, diffReport.ProductsMissingFromEip, ++lastRow);
 
                 SetSeparator(worksheet.Cells[lastRow, ExcelReport.ColumnOffset, lastRow, ExcelReport.DataEndColumn -1]);
-                SetMissingFromExcelHeader(worksheet, lastRow);
-                GenerateMissingExcelProductPart(worksheet, diffReport.ProductsMissingFromExcel, ++lastRow);
-                
+                SetEipHeader(worksheet, lastRow, ExcelReport.ProductsMissingFromExcel, diffReport.CheckedRange);
+                lastRow = GenerateMissingExcelProductPart(worksheet, diffReport.ProductsMissingFromExcel, ++lastRow);
+
+                SetSeparator(worksheet.Cells[++lastRow, ExcelReport.ColumnOffset, lastRow, ExcelReport.DataEndColumn - 1]);
+                SetOutOfRangeEiplHeader(worksheet, lastRow, diffReport.CheckedRange);
+                lastRow = GenerateOutOfRangeProductPart(worksheet, diffReport.ProductsOutOfSelectedRange, ++lastRow);
+
                 excelPackage.Save();
             }
         }
-        
 
         private void InitializeTableHeaders(ExcelWorksheet worksheet)
         {
@@ -193,11 +196,12 @@ namespace DiffGenerator2.Services
             SetBackgroundColor(range, ExcelReport.SeparatorColoring);
         }
 
-        private void SetMissingFromEipHeader(ExcelWorksheet worksheet, int currenRow)
+        private void SetMissingFromEipHeader(ExcelWorksheet worksheet, int currenRow, string checkedRange)
         {
             SetSeparator(worksheet.Cells[currenRow, ExcelReport.ColumnOffset, currenRow, ExcelReport.ColumnOffset + ExcelReport.ExcelProductColumnSpan -1]);
             worksheet.SetValue(currenRow, ExcelReport.ColumnOffset, ExcelReport.ProductsMissingFromEip);
-            worksheet.Cells[currenRow, ExcelReport.ColumnOffset].Style.Font.Bold = true;
+            worksheet.SetValue(currenRow, ExcelReport.ColumnOffset + 1, checkedRange);
+            worksheet.Cells[currenRow, ExcelReport.ColumnOffset, currenRow, ExcelReport.ColumnOffset + 1].Style.Font.Bold = true;
         }
 
         private void SetBackgroundColor(ExcelRangeBase range, Color color)
@@ -260,10 +264,21 @@ namespace DiffGenerator2.Services
             return lastRow;
         }
 
-        private void SetMissingFromExcelHeader(ExcelWorksheet worksheet, int currentRow)
+        private void SetEipHeader(ExcelWorksheet worksheet, int currentRow, string header, string checkedRange)
         {
-            worksheet.SetValue(currentRow, ExcelReport.EipDataStartColumn, ExcelReport.ProductsMissingFromExcel);
-            worksheet.Cells[currentRow, ExcelReport.EipDataStartColumn].Style.Font.Bold = true;
+            worksheet.SetValue(currentRow, ExcelReport.EipDataStartColumn, header);
+            worksheet.SetValue(currentRow, ExcelReport.EipDataStartColumn + 1, checkedRange);
+            worksheet.Cells[currentRow, ExcelReport.EipDataStartColumn, currentRow, ExcelReport.EipDataStartColumn + 1].Style.Font.Bold = true;
+        }
+
+        private void SetOutOfRangeEiplHeader(ExcelWorksheet worksheet, int currentRow, string checkedRange)
+        {
+            SetEipHeader(worksheet, currentRow, ExcelReport.ProductsOutOfRange, checkedRange);
+        }
+
+        private int GenerateOutOfRangeProductPart(ExcelWorksheet worksheet, IEnumerable<I07> productsOutOfSelectedRange, int lastRow)
+        {
+            return GenerateMissingExcelProductPart(worksheet, productsOutOfSelectedRange, lastRow);
         }
     }
 }

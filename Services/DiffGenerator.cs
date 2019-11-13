@@ -33,6 +33,7 @@ namespace DiffGenerator2.Services
                     var eipProduct = eipData.FirstOrDefault(data => data.Code.First() == excelProduct.Code 
                                                                  && data.DateDateTime.Year == excelProduct.Date.Year
                                                                  && data.DateDateTime.Month == excelProduct.Date.Month);
+
                     if(ProductIsFinished(eipProduct, excelProduct.CellBackgroundColors))
                     {
                         continue;//do not generate mismatch because its missing for a valid reason
@@ -61,8 +62,15 @@ namespace DiffGenerator2.Services
             {
                 Mismatches = mismatches,
                 ProductsMissingFromEip = excelProductsMissingFromEip,
-                ProductsMissingFromExcel = eipData.Where(e => !existingEipProductsInExcel.Contains(e))
+                ProductsMissingFromExcel = eipData.Where(e => !existingEipProductsInExcel.Contains(e) && ProductIsPartOfDateRange(e.DateDateTime, excelData)),
+                ProductsOutOfSelectedRange = eipData.Where(e => !existingEipProductsInExcel.Contains(e) && !ProductIsPartOfDateRange(e.DateDateTime, excelData)),
+                CheckedRange = excelData.Min(e => e.Date).ToString("yyyy-MM") + " - " + excelData.Max(e => e.Date).ToString("yyyy-MM")
             };
+        }
+
+        private bool ProductIsPartOfDateRange(DateTime eipDateTime, IEnumerable<ExcelBlockData> excelData)
+        {
+            return excelData.Any(d => d.Date.Year == eipDateTime.Year && d.Date.Month == eipDateTime.Month);
         }
 
         private bool ExcelProductIsFoundInEip(I07 eipProduct) => eipProduct != null;
