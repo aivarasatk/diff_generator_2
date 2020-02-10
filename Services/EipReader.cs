@@ -8,12 +8,18 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace DiffGenerator2.Services
 {
     public class EipReader : IEipReader
     {
         private ILogService _logService;
+
+        // filters control characters but allows only properly-formed surrogate sequences
+        private static Regex _invalidXMLChars = new Regex(
+            @"(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F\uFEFF\uFFFE\uFFFF]",
+            RegexOptions.Compiled);
 
         public EipReader(ILogService logService)
         {
@@ -42,7 +48,7 @@ namespace DiffGenerator2.Services
         public IEnumerable<I07> GetParsedEipContents(IEnumerable<string> content)
         {
             var prunedEipFile = string.Join("", PrunedEipFile(content));
-            var fileWithEscapedChars = EscapeCharacters(prunedEipFile);
+            var fileWithEscapedChars = RemoveInvalidXMLChars(EscapeCharacters(prunedEipFile));
             _logService.Information($"Deserliazing eip file");
             try
             {
@@ -57,6 +63,15 @@ namespace DiffGenerator2.Services
                 _logService.Error($"Deserializing failed",ex);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// removes any unusual unicode characters that can't be encoded into XML
+        /// </summary>
+        public static string RemoveInvalidXMLChars(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return "";
+            return _invalidXMLChars.Replace(text, "");
         }
 
         private IEnumerable<string> PrunedEipFile(IEnumerable<string> lines)
