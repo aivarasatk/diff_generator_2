@@ -48,7 +48,7 @@ namespace DiffGenerator2.Services
         public IEnumerable<I07> GetParsedEipContents(IEnumerable<string> content)
         {
             var prunedEipFile = string.Join("", PrunedEipFile(content));
-            var fileWithEscapedChars = EscapeCharacters(prunedEipFile);
+            var fileWithEscapedChars = RemoveInvalidXMLChars(EscapeCharacters(prunedEipFile));
             _logService.Information($"Deserliazing eip file");
             try
             {
