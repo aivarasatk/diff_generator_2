@@ -10,7 +10,7 @@ namespace DiffGenerator2.Constants
     {
         public static readonly List<string> Values = new List<string>
         {
-            "L", "tab.", "kap.", "cap."
+            "l", "L", "tab.", "kap.", "cap."
         };
     }
 }

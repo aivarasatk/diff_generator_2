@@ -324,7 +324,7 @@ namespace DiffGenerator2.Services
 
         private int GetAmountIntValue(string amountText)
         {
-            if (string.IsNullOrEmpty(amountText))
+            if (string.IsNullOrEmpty(amountText) || string.IsNullOrWhiteSpace(amountText))
             {
                 return 0;
             }
