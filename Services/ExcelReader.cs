@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Configuration;
 using OfficeOpenXml.Drawing;
+using System.Data;
 
 namespace DiffGenerator2.Services
 {
@@ -255,11 +256,9 @@ namespace DiffGenerator2.Services
         }
 
         private IEnumerable<ExcelProductData> GetProductDataForBlock(ExcelWorksheet sheet, 
-                                                                     SheetNavigation sheetNavigation,
-                                                                     BlockDataColumns blockDataColumns,
-                                                                     DateTime blockDateHeader)
+            SheetNavigation sheetNavigation, BlockDataColumns blockDataColumns, DateTime blockDateHeader)
         {
-            _logService.Information($"Getting product data for {blockDateHeader.ToString("yyyy-MM-dd")}");
+            _logService.Information($"Getting product data for {blockDateHeader:yyyy-MM-dd}");
             for (var i = sheetNavigation.DataStartRow; i < sheet.Dimension.Rows; ++i)
             {
                 var maker = sheet.GetValue<string>(i, sheetNavigation.MakerColumn);
@@ -267,14 +266,10 @@ namespace DiffGenerator2.Services
                 var name = sheet.GetValue<string>(i, sheetNavigation.NameColumn);
 
                 if (EndOfData(new List<string> { maker, code, name }))
-                {
                     yield break;
-                }
 
-                if (code == null)
-                {
+                if (code is null)
                     continue;
-                }
 
                 var amountFirstHalfCell = sheet.Cells[i, blockDataColumns.AmountFirstHalf];
                 var amountSecondHalfCell = sheet.Cells[i, blockDataColumns.AmountSecondHalf];
@@ -287,10 +282,15 @@ namespace DiffGenerator2.Services
                 var cellBackgroundColors = GetCellBackgroundColors(dataCells);
                 var cellsHaveShapes = CellsHaveShapes(dataCells, sheet.Drawings);
 
-                if (allCellsEmpty && !cellComments.Any() && !cellBackgroundColors.Any())
-                {
+                if (IsSkipableRow(allCellsEmpty, cellComments, cellBackgroundColors))
                     continue;
-                }
+
+                //we care if maker or name is null ONLY if we DON'T skip the row
+                if (maker is null)
+                    throw new NoNullAllowedException($"'Gamybos padalinys' cannot be empty. {sheet.Name};{blockDateHeader:yyyy-MM-dd};{code}");
+
+                if (name is null)
+                    throw new NoNullAllowedException($"'Pavadinimas' cannot be empty. {sheet.Name};{blockDateHeader:yyyy-MM-dd};{code}");
 
                 var amountFirstHalfText = amountFirstHalfCell.GetValue<string>();
                 var amountSecondHalfText = amountSecondHalfCell.GetValue<string>();
@@ -303,7 +303,7 @@ namespace DiffGenerator2.Services
                 }
                 catch(Exception ex)
                 {
-                    throw new FormatException($"Failed to parse amount for:{Environment.NewLine} {sheet.Name} {blockDateHeader.ToString("yyyy-MM-dd")} {code} {name} {ex.Message}", ex);
+                    throw new FormatException($"Failed to parse amount for:{Environment.NewLine} {sheet.Name} {blockDateHeader:yyyy-MM-dd} {code} {name} {ex.Message}", ex);
                 }
 
                 yield return new ExcelProductData
@@ -314,13 +314,16 @@ namespace DiffGenerator2.Services
                     AmountFirstHalf = amountFirstHalf,
                     AmountSecondHalf = amountSecondHalf,
                     Date = SetProductDate(amountFirstHalfCell, amountSecondHalfCell, blockDateHeader),
-                    Details = commentsCell.GetValue<string>(),
+                    Details = commentsCell.GetValue<string>() ?? string.Empty,
                     Comments = cellComments,
                     CellBackgroundColors = cellBackgroundColors,
                     HasShapes = cellsHaveShapes
                 };
             }
         }
+
+        private bool IsSkipableRow(bool allCellsEmpty, IEnumerable<string> cellComments, IEnumerable<string> cellBackgroundColors)
+            => allCellsEmpty && !cellComments.Any() && !cellBackgroundColors.Any();
 
         private int GetAmountIntValue(string amountText)
         {
