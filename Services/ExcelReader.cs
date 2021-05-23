@@ -139,8 +139,8 @@ namespace DiffGenerator2.Services
             var splitValues = excelValue.Split('-');
             try
             {
-                sheetNavigation.BlockHeaderRow = Int32.Parse(splitValues[1]);
-                sheetNavigation.DataStartRow = Int32.Parse(splitValues[2]);
+                sheetNavigation.BlockHeaderRow = int.Parse(splitValues[1]);
+                sheetNavigation.DataStartRow = int.Parse(splitValues[2]);
                 return sheetNavigation;
             }
             catch (Exception ex)
@@ -245,7 +245,7 @@ namespace DiffGenerator2.Services
             var blockHeader = GetBlockHeader(sheet, sheetNavigation.Value, blockDataColumns);
 
             _logService.Information($"Parsing block header for '{blockHeader}'");
-            var parasedBlockHeader = ParsedBlockHeader(blockHeader);
+            var parasedBlockHeader = ExcelParser.ParsedBlockHeader(blockHeader);
 
             return new ExcelBlockData
             {
@@ -275,6 +275,7 @@ namespace DiffGenerator2.Services
                 var amountSecondHalfCell = sheet.Cells[i, blockDataColumns.AmountSecondHalf];
                 var dateCell = sheet.Cells[i, blockDataColumns.Date];
                 var commentsCell = sheet.Cells[i, blockDataColumns.Comments];
+                var details = commentsCell.GetValue<string>() ?? string.Empty;
                 var dataCells = new List<ExcelRange> { amountFirstHalfCell, amountSecondHalfCell, dateCell, commentsCell };
 
                 var allCellsEmpty = AllCellsEmpty(dataCells);
@@ -294,12 +295,14 @@ namespace DiffGenerator2.Services
 
                 var amountFirstHalfText = amountFirstHalfCell.GetValue<string>();
                 var amountSecondHalfText = amountSecondHalfCell.GetValue<string>();
+
                 var amountFirstHalf = 0;
                 var amountSecondHalf = 0;
+                
                 try
                 {
-                    amountFirstHalf = GetAmountIntValue(amountFirstHalfText);
-                    amountSecondHalf = GetAmountIntValue(amountSecondHalfText);
+                    amountFirstHalf = ExcelParser.GetAmountIntValue(amountFirstHalfText);
+                    amountSecondHalf = ExcelParser.GetAmountIntValue(amountSecondHalfText);
                 }
                 catch(Exception ex)
                 {
@@ -314,7 +317,8 @@ namespace DiffGenerator2.Services
                     AmountFirstHalf = amountFirstHalf,
                     AmountSecondHalf = amountSecondHalf,
                     Date = SetProductDate(amountFirstHalfCell, amountSecondHalfCell, blockDateHeader),
-                    Details = commentsCell.GetValue<string>() ?? string.Empty,
+                    Details = details.Trim(),
+                    OrderNumber = ExcelParser.ExtractOrderNumber(details.Trim()),
                     Comments = cellComments,
                     CellBackgroundColors = cellBackgroundColors,
                     HasShapes = cellsHaveShapes
@@ -324,31 +328,6 @@ namespace DiffGenerator2.Services
 
         private bool IsSkipableRow(bool allCellsEmpty, IEnumerable<string> cellComments, IEnumerable<string> cellBackgroundColors)
             => allCellsEmpty && !cellComments.Any() && !cellBackgroundColors.Any();
-
-        private int GetAmountIntValue(string amountText)
-        {
-            if (string.IsNullOrEmpty(amountText) || string.IsNullOrWhiteSpace(amountText))
-            {
-                return 0;
-            }
-            var cleanAmountText = amountText;
-            foreach (var postfix in AllowedAmountPostfixes.Values)
-            {
-                var index = amountText.IndexOf(postfix);
-                if (index != -1)
-                {
-                    cleanAmountText = amountText.Remove(index, postfix.Length);
-                    break;
-                }
-            }
-
-            if(Int32.TryParse(cleanAmountText, out var res))
-            {
-                return res;
-            }
-
-            throw new ArgumentException($"'{amountText}' is not a valid number");
-        }
 
         private DateTime SetProductDate(ExcelRange amountFirstHalfCell, ExcelRange amountSecondHalfCell, DateTime headerDate)
         {
@@ -414,11 +393,6 @@ namespace DiffGenerator2.Services
             return true;
         }
 
-        private bool CellHasShapes(ExcelRange cell)
-        {
-            throw new NotImplementedException();
-        }
-
         private bool DefaultCellBackgroundColor(ExcelRange cell)
         {
             return cell.Style.Fill.BackgroundColor.Rgb == null
@@ -439,36 +413,6 @@ namespace DiffGenerator2.Services
                    amountSecondHalfValue ??
                    dateValue ??
                    commentsValue ?? throw new Exception($"Could not find block header for {sheet.Name}. AmountFirstHalf column ID: {blockData.AmountFirstHalf}");
-        }
-
-        private DateTime ParsedBlockHeader(string blockHeader)
-        {
-            var splitHeader = blockHeader.Trim().Split(' ');
-            var numericMonthValue = GetMonthNumber(splitHeader[0]);
-            var numericYearValue = GetYearNumber(splitHeader[1]);
-            return new DateTime(numericYearValue, numericMonthValue, 1);
-        }
-
-        private int GetYearNumber(string year) => Int32.Parse(year);
-
-        private int GetMonthNumber(string month)
-        {
-            switch (month.ToLower())
-            {
-                case "sausis": return 1;
-                case "vasaris": return 2;
-                case "kovas": return 3;
-                case "balandis": return 4;
-                case "gegužė": return 5;
-                case "birželis": return 6;
-                case "liepa": return 7;
-                case "rugpjūtis": return 8;
-                case "rugsėjis": return 9;
-                case "spalis": return 10;
-                case "lapkritis": return 11;
-                case "gruodis": return 12;
-                default: throw new Exception($"Header month '{month}' is not a valid month");
-            }
         }
     }
 }

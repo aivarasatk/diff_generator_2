@@ -9,15 +9,18 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DiffGenerator2.Services
 {
-    public class ExcelReportGenerator : IExcelReportGenerator
+    public class ReportGenerator : IReportGenerator
     {
-        public void GenerateReport(DiffReport diffReport)
+        private const string DateFormat = "yyyy-MM-dd_hh-mm-ss";
+
+        private readonly string ReportFolderPath = $"{Directory.GetCurrentDirectory()}\\Reports";
+        
+        public void GenerateDiffReport(DiffReport diffReport)
         {
-            var path = Path.Combine($"{Directory.GetCurrentDirectory()}\\Reports", $"report_{DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss")}.xlsx");
+            var path = Path.Combine(ReportFolderPath, $"report_{DateTime.Now.ToString(DateFormat)}.xlsx");
             var fileInfo = new FileInfo(path);
             fileInfo.Directory.Create();//creating a dir if does not exist
 
@@ -279,6 +282,31 @@ namespace DiffGenerator2.Services
         private int GenerateOutOfRangeProductPart(ExcelWorksheet worksheet, IEnumerable<I07> productsOutOfSelectedRange, int lastRow)
         {
             return GenerateMissingExcelProductPart(worksheet, productsOutOfSelectedRange, lastRow);
+        }
+
+        public void GenerateOrderReport(OrderReport orderReport)
+        {
+            var path = Path.Combine(ReportFolderPath, $"uzsakymu_numeriu_report_{DateTime.Now.ToString(DateFormat)}.txt");
+            var fileInfo = new FileInfo(path);
+            fileInfo.Directory.Create();
+
+            var reportBuilder = new StringBuilder();
+            reportBuilder.AppendLine("Užsakymai žemiau apatinio intervalo rėžio:");
+
+            foreach(var order in orderReport.BelowLowerBound)
+                reportBuilder.AppendLine(order.ToString());
+
+            reportBuilder.AppendLine("Užsakymai nepatenkantys į intervalą:");
+
+            foreach (var order in orderReport.MissingInInterval)
+                reportBuilder.AppendLine(order.ToString());
+
+            reportBuilder.AppendLine("Užsakymai aukščiau viršutinio intervalo rėžio:");
+
+            foreach (var order in orderReport.AboveUpperBound)
+                reportBuilder.AppendLine(order.ToString());
+
+            File.WriteAllText(path, reportBuilder.ToString());
         }
     }
 }
