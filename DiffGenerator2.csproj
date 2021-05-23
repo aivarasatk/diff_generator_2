@@ -122,16 +122,18 @@
     <Compile Include="DTOs\I06.cs" />
     <Compile Include="DTOs\I07.cs" />
     <Compile Include="DTOs\Mismatch.cs" />
+    <Compile Include="DTOs\OrderReport.cs" />
     <Compile Include="DTOs\SheetNavigation.cs" />
     <Compile Include="Enums\FileSelect.cs" />
     <Compile Include="Interfaces\ICommandFactory.cs" />
     <Compile Include="Interfaces\IDiffGenerator.cs" />
     <Compile Include="Interfaces\IEipReader.cs" />
     <Compile Include="Interfaces\IExcelReader.cs" />
-    <Compile Include="Interfaces\IExcelReportGenerator.cs" />
+    <Compile Include="Interfaces\IReportGenerator.cs" />
     <Compile Include="Interfaces\IFileSelector.cs" />
     <Compile Include="Interfaces\ILifetimeService.cs" />
     <Compile Include="Interfaces\ILogService.cs" />
+    <Compile Include="Interfaces\IOrderDiffGenerator.cs" />
     <Compile Include="Model\InformationDialogModel.cs" />
     <Compile Include="Model\MainModel.cs" />
     <Compile Include="Model\MainModel.g.cs" />
@@ -140,12 +142,14 @@
     <Compile Include="Model\NotifyPropertyChangedExtension.cs" />
     <Compile Include="Services\DiffGenerator.cs" />
     <Compile Include="Services\EipReader.cs" />
+    <Compile Include="Services\ExcelParser.cs" />
     <Compile Include="Services\ExcelReader.cs" />
-    <Compile Include="Services\ExcelReportGenerator.cs" />
+    <Compile Include="Services\ReportGenerator.cs" />
     <Compile Include="Services\FileSelector.cs" />
     <Compile Include="Services\LifetimeService.cs" />
     <Compile Include="Services\LogService.cs" />
     <Compile Include="Services\LoggerBuilder.cs" />
+    <Compile Include="Services\OrderDiffGenerator.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="Views\InformationDialogView.xaml.cs">
       <DependentUpon>InformationDialogView.xaml</DependentUpon>

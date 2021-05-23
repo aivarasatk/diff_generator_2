@@ -15,110 +15,65 @@ namespace DiffGenerator2.Model
 {
     public partial class MainModel : INotifyPropertyChanged, IDataErrorInfo
     {
-        public static string ExcelFileNamePropertyName = "ExcelFileName";
-
         public string ExcelFileName
         {
-            get
-            {
-                return _excelFileName;
-            }
-            set
-            {
-                this.MutateVerbose(ref _excelFileName, value, RaisePropertyChanged());
-            }
+            get => _excelFileName;
+            set => this.MutateVerbose(ref _excelFileName, value, RaisePropertyChanged());
         }
-
-        public static string EipFileNamePropertyName = "EipFileName";
 
         public string EipFileName
         {
-            get
-            {
-                return _eipFileName;
-            }
-            set
-            {
-                this.MutateVerbose(ref _eipFileName, value, RaisePropertyChanged());
-            }
+            get => _eipFileName;
+            set => this.MutateVerbose(ref _eipFileName, value, RaisePropertyChanged());
         }
 
-        public static string ExecuteEnabledPropertyName = "ExecuteEnabled";
+        public int OrderNumberRangeStart
+        {
+            get => _orderNumberRangeStart;
+            set => this.MutateVerbose(ref _orderNumberRangeStart, value, RaisePropertyChanged());
+        }
+
+        public int OrderNumberRangeEnd
+        {
+            get => _orderNumberRangeEnd;
+            set => this.MutateVerbose(ref _orderNumberRangeEnd, value, RaisePropertyChanged());
+        }
 
         public bool ExecuteEnabled
         {
-            get
-            {
-                return _executeEnabled;
-            }
-            set
-            {
-                this.MutateVerbose(ref _executeEnabled, value, RaisePropertyChanged());
-            }
+            get => _executeEnabled;
+            set => this.MutateVerbose(ref _executeEnabled, value, RaisePropertyChanged());
         }
 
-        public static string SheetItemsPropertyName = "SheetItems";
         public ObservableCollection<SheetCheckBoxItem> SheetItems
         {
-            get
-            {
-                return _sheetItems;
-            }
-            set
-            {
-                this.MutateVerbose(ref _sheetItems, value, RaisePropertyChanged());
-            }
+            get => _sheetItems;
+            set => this.MutateVerbose(ref _sheetItems, value, RaisePropertyChanged());
         }
 
-        public static string MonthOnlySheetsPropertyName = "MonthOnlySheets";
         public ObservableCollection<SheetCheckBoxItem> MonthOnlySheets
         {
-            get
-            {
-                return _monthOnlySheets;
-            }
-            set
-            {
-                this.MutateVerbose(ref _monthOnlySheets, value, RaisePropertyChanged());
-            }
+            get => _monthOnlySheets;
+            set => this.MutateVerbose(ref _monthOnlySheets, value, RaisePropertyChanged());
         }
 
-        public static string IsLoadingPropertyName = "IsLoading";
 
         public Visibility IsLoading
         {
-            get
-            {
-                return _isLoading;
-            }
-            set
-            {
-                this.MutateVerbose(ref _isLoading, value, RaisePropertyChanged());
-            }
+            get => _isLoading;
+            set => this.MutateVerbose(ref _isLoading, value, RaisePropertyChanged());
         }
 
-        public static string SheetSelectionVisibilityPropertyName = "SheetSelectionVisibility";
         public Visibility SheetSelectionVisibility
         {
-            get
-            {
-                return _sheetSelectionVisibility;
-            }
-            set
-            {
-                this.MutateVerbose(ref _sheetSelectionVisibility, value, RaisePropertyChanged());
-            }
+            get => _sheetSelectionVisibility;
+            set => this.MutateVerbose(ref _sheetSelectionVisibility, value, RaisePropertyChanged());
         }
 
-        public static string ErrorPropertyName = "Error";
-
-        public string Error {
-            get { return _error; }
-
-            set
-            {
-                this.MutateVerbose(ref _error, value, RaisePropertyChanged());
-            }
+        public string Error 
+        {
+            get => _error;
+            set => this.MutateVerbose(ref _error, value, RaisePropertyChanged());
         }
 
         public string this[string columnName]

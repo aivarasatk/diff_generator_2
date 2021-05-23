@@ -16,19 +16,25 @@ namespace DiffGenerator2.ViewModel
 {
     public class MainViewModel
     {
+        private const string OrderCheckSheetName = "GP_KO";
+
         private readonly ICommandFactory _commandFactory;
         private readonly ILifetimeService _lifetimeService;
+        private readonly IOrderDiffGenerator _orderDiffGenerator;
+
         public MainModel Model { get; }
-        
 
         private ILogService _logService;
 
-        public MainViewModel(ICommandFactory commandFactory, ILogService logService, ILifetimeService lifetimeService)
+        public MainViewModel(ICommandFactory commandFactory,
+            ILogService logService,
+            ILifetimeService lifetimeService,
+            IOrderDiffGenerator orderDiffGenerator)
         {
             _commandFactory = commandFactory ?? throw new ArgumentNullException(nameof(commandFactory));
             _logService = logService ?? throw new ArgumentNullException(nameof(logService));
             _lifetimeService = lifetimeService ?? throw new ArgumentNullException(nameof(lifetimeService));
-
+            _orderDiffGenerator = orderDiffGenerator ?? throw new ArgumentNullException(nameof(orderDiffGenerator));
             Model = new MainModel();
 
             _logService.Information("PROGRAM STARTING!");
@@ -158,11 +164,29 @@ namespace DiffGenerator2.ViewModel
                     return;
                 }
 
+                if(Model.OrderNumberRangeStart < 0 
+                    || Model.OrderNumberRangeEnd <= 0
+                    || Model.OrderNumberRangeEnd < Model.OrderNumberRangeStart)
+                {
+                    await ShowMessageDialogAsync(DialogIcon.InformationFilled, "Neteisingas užsakymo numerių intervalas");
+                    return;
+                }
+
                 Model.IsLoading = Visibility.Visible;
 
                 _logService.Information("Started generating diff");
-                var diffReport = await GetDiffReportAsync();
+                var (excelProductData, eipData) = await GetSourceDataAsync();
+                var diffReport = await GetDiffReportAsync(excelProductData, eipData);
                 await GenerateExcelReportAsync(diffReport);
+
+                var orderNums = excelProductData.Where(e => e.SheetName == OrderCheckSheetName)
+                    .SelectMany(e => e.ProductData)
+                    .Where(e => e.OrderNumber.HasValue)
+                    .Select(e => e.OrderNumber.Value)
+                    .ToArray();
+
+                var orderDiffReport = _orderDiffGenerator.InclusionReport(orderNums, Model.OrderNumberRangeStart, Model.OrderNumberRangeEnd);
+                await GenerateOrderDiffAsync(orderDiffReport);
 
                 Model.IsLoading = Visibility.Collapsed;
 
@@ -179,11 +203,20 @@ namespace DiffGenerator2.ViewModel
             }
         }
 
-        private Task<DiffReport> GetDiffReportAsync()
+        private async Task GenerateOrderDiffAsync(OrderReport orderDiffReport)
         {
-            return Task.Run(() => {
+            await Task.Run(() =>
+            {
+                _logService.Information("Start generating order diff report");
+                _lifetimeService.ExecuteInLifetime<IReportGenerator>(generator => generator.GenerateOrderReport(orderDiffReport));
+            });
+        }
+
+        private async Task<(IEnumerable<ExcelBlockData> excelProductData, IEnumerable<I07> eipData)> GetSourceDataAsync()
+        {
+            return await Task.Run(() => {
                 var excelProductData = _lifetimeService.ExecuteInLifetime<IEnumerable<ExcelBlockData>, IExcelReader>(
-                    reader =>  reader.GetExcelProductData(Model.ExcelFileName, Model.SheetItems.Where(item => item.IsChecked)));
+                    reader => reader.GetExcelProductData(Model.ExcelFileName, Model.SheetItems.Where(item => item.IsChecked)));
 
                 var eipData = _lifetimeService.ExecuteInLifetime<IEnumerable<I07>, IEipReader>(
                     reader => {
@@ -191,9 +224,17 @@ namespace DiffGenerator2.ViewModel
                         return reader.GetParsedEipContents(content);
                     });
 
+                return (excelProductData, eipData);
+            });
+        }
+
+        private async Task<DiffReport> GetDiffReportAsync(IEnumerable<ExcelBlockData> excelProductData, IEnumerable<I07> eipData)
+        {
+            return await Task.Run(() =>
+            {
                 return _lifetimeService.ExecuteInLifetime<DiffReport, IDiffGenerator>(
-                    reader => reader.GenerateDiffReport(eipData.ToList(), excelProductData.ToList(), 
-                                                        Model.MonthOnlySheets.Where(s => s.IsChecked).ToList()));
+                       generator => generator.GenerateDiffReport(eipData.ToList(), excelProductData.ToList(),
+                                                           Model.MonthOnlySheets.Where(s => s.IsChecked).ToList()));
             });
         }
 
@@ -202,7 +243,7 @@ namespace DiffGenerator2.ViewModel
             return Task.Run(() =>
             {
                 _logService.Information("Start generating excel report");
-                _lifetimeService.ExecuteInLifetime<IExcelReportGenerator>(generator => generator.GenerateReport(diffReport));
+                _lifetimeService.ExecuteInLifetime<IReportGenerator>(generator => generator.GenerateDiffReport(diffReport));
             });
         }
 

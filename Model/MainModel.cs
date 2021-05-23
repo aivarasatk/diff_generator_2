@@ -1,10 +1,6 @@
 ﻿using DiffGenerator2.DTOs;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -15,8 +11,13 @@ namespace DiffGenerator2.Model
         private string _excelFileName;
         private string _eipFileName;
         private bool _executeEnabled;
+
+        private int _orderNumberRangeStart;
+        private int _orderNumberRangeEnd;
+
         private Visibility _isLoading;
         private Visibility _sheetSelectionVisibility;
+
         private ObservableCollection<SheetCheckBoxItem> _sheetItems;
         private ObservableCollection<SheetCheckBoxItem> _monthOnlySheets;
 

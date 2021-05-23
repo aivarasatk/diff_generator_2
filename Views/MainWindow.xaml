@@ -36,6 +36,7 @@
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,32">
@@ -84,7 +85,14 @@
                         </GroupBox>
                     </StackPanel>
 
-                    <Grid Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,32">
+                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,16">
+                        <TextBlock VerticalAlignment="Center" Text="Užsakymo numerių tikrinimo intervalas:" Margin="0,0,8,0"/>
+                        <TextBox Width="50" Text="{Binding Model.OrderNumberRangeStart}" Margin="0,0,8,0"/>
+                        <Label Content="-"/>
+                        <TextBox Width="50" Text="{Binding Model.OrderNumberRangeEnd}" Margin="8,0,0,0"/>
+                    </StackPanel>
+
+                    <Grid Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,0,32">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="190" />
                             <ColumnDefinition Width="2*" />
@@ -106,7 +114,7 @@
                             Command="{Binding Path=Model.SelectEipFileCommand}"/>
                     </Grid>
 
-                    <Grid Grid.Row="3" Margin="0,16,0,0">
+                    <Grid Grid.Row="4" Margin="0,16,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
