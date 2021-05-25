@@ -20,9 +20,10 @@ namespace Tests
             var logService = new Mock<ILogService>();
             var commandService = new CommandFactory();
             var lifetimeService = new Mock<ILifetimeService>();
+            var orderDiffGenerator = new Mock<IOrderDiffGenerator>();
 
             //assess
-            var mainViewModel = new MainViewModel(commandService, logService.Object, lifetimeService.Object);
+            var mainViewModel = new MainViewModel(commandService, logService.Object, lifetimeService.Object, orderDiffGenerator.Object);
 
             //assert
             Assert.IsTrue(mainViewModel.Model.IsLoading == Visibility.Collapsed);
@@ -35,9 +36,10 @@ namespace Tests
             var logService = new Mock<ILogService>();
             var commandService = new CommandFactory();
             var lifetimeService = new Mock<ILifetimeService>();
+            var orderDiffGenerator = new Mock<IOrderDiffGenerator>();
 
             //assess
-            var mainViewModel = new MainViewModel(commandService, logService.Object, lifetimeService.Object);
+            var mainViewModel = new MainViewModel(commandService, logService.Object, lifetimeService.Object, orderDiffGenerator.Object);
 
             //assert
             Assert.IsTrue(mainViewModel.Model.SheetSelectionVisibility == Visibility.Collapsed);
@@ -50,11 +52,13 @@ namespace Tests
 
             var logService = new Mock<ILogService>();
             var commandService = new CommandFactory();
+            var orderDiffGenerator = new Mock<IOrderDiffGenerator>();
+
             var lifetimeService = new Mock<ILifetimeService>();
             lifetimeService.Setup(service => service.ExecuteInLifetime(It.IsAny<Func<IFileSelector,string>>())).Returns("fileName");
             lifetimeService.Setup(service => service.ExecuteInLifetime(It.IsAny<Func<IExcelReader, IEnumerable<string>>>())).Returns(new List<string>());
-
-            var mainViewModel = new MainViewModel(commandService, logService.Object, lifetimeService.Object);
+            
+            var mainViewModel = new MainViewModel(commandService, logService.Object, lifetimeService.Object, orderDiffGenerator.Object);
 
             //assess
             mainViewModel.Model.SelectExcelFileCommand.Execute(null);

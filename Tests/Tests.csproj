@@ -40,6 +40,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="EipReaderTests.cs" />
+    <Compile Include="OrderDiffGeneratorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DiffGeneratorTests.cs" />
     <Compile Include="UITests.cs" />
